@@ -241,6 +241,20 @@ example_builder/fast:
 	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f examples/CMakeFiles/example_builder.dir/build.make examples/CMakeFiles/example_builder.dir/build
 .PHONY : example_builder/fast
 
+# Convenience name for target.
+examples/CMakeFiles/example_yaml.dir/rule:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 examples/CMakeFiles/example_yaml.dir/rule
+.PHONY : examples/CMakeFiles/example_yaml.dir/rule
+
+# Convenience name for target.
+example_yaml: examples/CMakeFiles/example_yaml.dir/rule
+.PHONY : example_yaml
+
+# fast build rule for target.
+example_yaml/fast:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f examples/CMakeFiles/example_yaml.dir/build.make examples/CMakeFiles/example_yaml.dir/build
+.PHONY : example_yaml/fast
+
 basic_usage.o: basic_usage.cpp.o
 .PHONY : basic_usage.o
 
@@ -361,6 +375,30 @@ oop_to_json_converter.cpp.s:
 	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f examples/CMakeFiles/example_converter.dir/build.make examples/CMakeFiles/example_converter.dir/oop_to_json_converter.cpp.s
 .PHONY : oop_to_json_converter.cpp.s
 
+yaml_config_example.o: yaml_config_example.cpp.o
+.PHONY : yaml_config_example.o
+
+# target to build an object file
+yaml_config_example.cpp.o:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f examples/CMakeFiles/example_yaml.dir/build.make examples/CMakeFiles/example_yaml.dir/yaml_config_example.cpp.o
+.PHONY : yaml_config_example.cpp.o
+
+yaml_config_example.i: yaml_config_example.cpp.i
+.PHONY : yaml_config_example.i
+
+# target to preprocess a source file
+yaml_config_example.cpp.i:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f examples/CMakeFiles/example_yaml.dir/build.make examples/CMakeFiles/example_yaml.dir/yaml_config_example.cpp.i
+.PHONY : yaml_config_example.cpp.i
+
+yaml_config_example.s: yaml_config_example.cpp.s
+.PHONY : yaml_config_example.s
+
+# target to generate assembly for a file
+yaml_config_example.cpp.s:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f examples/CMakeFiles/example_yaml.dir/build.make examples/CMakeFiles/example_yaml.dir/yaml_config_example.cpp.s
+.PHONY : yaml_config_example.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -379,6 +417,7 @@ help:
 	@echo "... example_config_builder"
 	@echo "... example_converter"
 	@echo "... example_json"
+	@echo "... example_yaml"
 	@echo "... basic_usage.o"
 	@echo "... basic_usage.i"
 	@echo "... basic_usage.s"
@@ -394,6 +433,9 @@ help:
 	@echo "... oop_to_json_converter.o"
 	@echo "... oop_to_json_converter.i"
 	@echo "... oop_to_json_converter.s"
+	@echo "... yaml_config_example.o"
+	@echo "... yaml_config_example.i"
+	@echo "... yaml_config_example.s"
 .PHONY : help
 
 

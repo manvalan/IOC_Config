@@ -1894,6 +1894,218 @@ std::vector<ConfigParameter> OopParser::getParametersByType(const std::string& t
     return results;
 }
 
+// ============ Path-Based Access Implementation (RFC 6901) ============
+
+std::vector<std::string> OopParser::parsePath(const std::string& path) {
+    std::vector<std::string> components;
+    
+    if (path.empty() || path == "/") {
+        return components;  // Root path
+    }
+    
+    if (path[0] != '/') {
+        // Invalid path, must start with /
+        return components;
+    }
+    
+    size_t start = 1;
+    size_t pos = 1;
+    
+    while (pos <= path.length()) {
+        if (pos == path.length() || path[pos] == '/') {
+            if (pos > start) {
+                std::string token = path.substr(start, pos - start);
+                components.push_back(unescapePathToken(token));
+            }
+            start = pos + 1;
+        }
+        pos++;
+    }
+    
+    return components;
+}
+
+std::string OopParser::escapePathToken(const std::string& token) {
+    std::string escaped;
+    for (char c : token) {
+        if (c == '~') {
+            escaped += "~0";
+        } else if (c == '/') {
+            escaped += "~1";
+        } else {
+            escaped += c;
+        }
+    }
+    return escaped;
+}
+
+std::string OopParser::unescapePathToken(const std::string& token) {
+    std::string unescaped;
+    size_t i = 0;
+    
+    while (i < token.length()) {
+        if (token[i] == '~' && i + 1 < token.length()) {
+            if (token[i + 1] == '0') {
+                unescaped += '~';
+                i += 2;
+            } else if (token[i + 1] == '1') {
+                unescaped += '/';
+                i += 2;
+            } else {
+                unescaped += token[i];
+                i++;
+            }
+        } else {
+            unescaped += token[i];
+            i++;
+        }
+    }
+    
+    return unescaped;
+}
+
+std::string OopParser::getValueByPath(const std::string& path) const {
+    auto components = parsePath(path);
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+    
+    // Root path
+    if (components.empty()) {
+        json root_json = json::object();
+        for (const auto& section : sections_) {
+            json section_obj = json::object();
+            for (const auto& [key, param] : section.parameters) {
+                section_obj[key] = param.value;
+            }
+            root_json[section.name] = section_obj;
+        }
+        return root_json.dump();
+    }
+    
+    // Find section
+    if (components.size() >= 1) {
+        auto section_it = std::find_if(sections_.begin(), sections_.end(),
+            [&](const ConfigSectionData& s) { return s.name == components[0]; });
+        
+        if (section_it == sections_.end()) {
+            return "";  // Section not found
+        }
+        
+        // If only section requested
+        if (components.size() == 1) {
+            json section_obj = json::object();
+            for (const auto& [key, param] : section_it->parameters) {
+                section_obj[key] = param.value;
+            }
+            return section_obj.dump();
+        }
+        
+        // Find parameter
+        if (components.size() >= 2) {
+            auto param_it = section_it->parameters.find(components[1]);
+            if (param_it != section_it->parameters.end()) {
+                return param_it->second.value;
+            }
+        }
+    }
+    
+    return "";
+}
+
+bool OopParser::setValueByPath(const std::string& path, const std::string& value) {
+    auto components = parsePath(path);
+    
+    if (components.empty() || components.size() < 2) {
+        lastError_ = "Path must have at least section and key";
+        return false;
+    }
+    
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+    
+    // Find or create section
+    auto section_it = std::find_if(sections_.begin(), sections_.end(),
+        [&](const ConfigSectionData& s) { return s.name == components[0]; });
+    
+    if (section_it == sections_.end()) {
+        // Create new section
+        ConfigSectionData new_section;
+        new_section.name = components[0];
+        new_section.type = ConfigSectionData::stringToSectionType(components[0]);
+        sections_.push_back(new_section);
+        section_it = sections_.end() - 1;
+    }
+    
+    // Set parameter
+    ConfigParameter param;
+    param.key = components[1];
+    param.value = value;
+    param.type = detectType(value);
+    
+    section_it->parameters[components[1]] = param;
+    
+    return true;
+}
+
+bool OopParser::hasPath(const std::string& path) const {
+    return !getValueByPath(path).empty();
+}
+
+bool OopParser::deleteByPath(const std::string& path) {
+    auto components = parsePath(path);
+    
+    if (components.empty()) {
+        lastError_ = "Cannot delete root path";
+        return false;
+    }
+    
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+    
+    // Find section
+    auto section_it = std::find_if(sections_.begin(), sections_.end(),
+        [&](const ConfigSectionData& s) { return s.name == components[0]; });
+    
+    if (section_it == sections_.end()) {
+        lastError_ = "Section not found: " + components[0];
+        return false;
+    }
+    
+    if (components.size() == 1) {
+        // Delete entire section
+        sections_.erase(section_it);
+        return true;
+    }
+    
+    if (components.size() >= 2) {
+        // Delete parameter
+        auto param_it = section_it->parameters.find(components[1]);
+        if (param_it != section_it->parameters.end()) {
+            section_it->parameters.erase(param_it);
+            return true;
+        }
+    }
+    
+    lastError_ = "Path not found: " + path;
+    return false;
+}
+
+std::vector<std::string> OopParser::getAllPaths() const {
+    std::vector<std::string> paths;
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+    
+    for (const auto& section : sections_) {
+        // Add section path
+        paths.push_back("/" + escapePathToken(section.name));
+        
+        // Add parameter paths
+        for (const auto& [key, param] : section.parameters) {
+            std::string param_path = "/" + escapePathToken(section.name) + 
+                                     "/" + escapePathToken(key);
+            paths.push_back(param_path);
+        }
+    }
+    
+    return paths;
+}
+
 // ============ Utility Functions ============
 
 bool convertOopToJson(const std::string& oopFilepath, 

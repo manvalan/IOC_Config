@@ -48,3 +48,9 @@ target_link_libraries(test_merge_diff PRIVATE ioc_config_static)
 target_include_directories(test_merge_diff PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 add_test(NAME MergeDiffTest COMMAND test_merge_diff)
 
+# Test 9: RFC 6901 Path-based access (NEW)
+add_executable(test_path_access test_path_access.cpp)
+target_link_libraries(test_path_access PRIVATE ioc_config_static)
+target_include_directories(test_path_access PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+add_test(NAME PathAccessTest COMMAND test_path_access)
+

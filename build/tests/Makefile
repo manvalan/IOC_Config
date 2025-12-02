@@ -255,6 +255,48 @@ test_builder_schema/fast:
 	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_builder_schema.dir/build.make tests/CMakeFiles/test_builder_schema.dir/build
 .PHONY : test_builder_schema/fast
 
+# Convenience name for target.
+tests/CMakeFiles/test_yaml.dir/rule:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_yaml.dir/rule
+.PHONY : tests/CMakeFiles/test_yaml.dir/rule
+
+# Convenience name for target.
+test_yaml: tests/CMakeFiles/test_yaml.dir/rule
+.PHONY : test_yaml
+
+# fast build rule for target.
+test_yaml/fast:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_yaml.dir/build.make tests/CMakeFiles/test_yaml.dir/build
+.PHONY : test_yaml/fast
+
+# Convenience name for target.
+tests/CMakeFiles/test_merge_diff.dir/rule:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_merge_diff.dir/rule
+.PHONY : tests/CMakeFiles/test_merge_diff.dir/rule
+
+# Convenience name for target.
+test_merge_diff: tests/CMakeFiles/test_merge_diff.dir/rule
+.PHONY : test_merge_diff
+
+# fast build rule for target.
+test_merge_diff/fast:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_merge_diff.dir/build.make tests/CMakeFiles/test_merge_diff.dir/build
+.PHONY : test_merge_diff/fast
+
+# Convenience name for target.
+tests/CMakeFiles/test_path_access.dir/rule:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_path_access.dir/rule
+.PHONY : tests/CMakeFiles/test_path_access.dir/rule
+
+# Convenience name for target.
+test_path_access: tests/CMakeFiles/test_path_access.dir/rule
+.PHONY : test_path_access
+
+# fast build rule for target.
+test_path_access/fast:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_path_access.dir/build.make tests/CMakeFiles/test_path_access.dir/build
+.PHONY : test_path_access/fast
+
 test_builder.o: test_builder.cpp.o
 .PHONY : test_builder.o
 
@@ -375,6 +417,30 @@ test_json.cpp.s:
 	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_json.dir/build.make tests/CMakeFiles/test_json.dir/test_json.cpp.s
 .PHONY : test_json.cpp.s
 
+test_merge_diff.o: test_merge_diff.cpp.o
+.PHONY : test_merge_diff.o
+
+# target to build an object file
+test_merge_diff.cpp.o:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_merge_diff.dir/build.make tests/CMakeFiles/test_merge_diff.dir/test_merge_diff.cpp.o
+.PHONY : test_merge_diff.cpp.o
+
+test_merge_diff.i: test_merge_diff.cpp.i
+.PHONY : test_merge_diff.i
+
+# target to preprocess a source file
+test_merge_diff.cpp.i:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_merge_diff.dir/build.make tests/CMakeFiles/test_merge_diff.dir/test_merge_diff.cpp.i
+.PHONY : test_merge_diff.cpp.i
+
+test_merge_diff.s: test_merge_diff.cpp.s
+.PHONY : test_merge_diff.s
+
+# target to generate assembly for a file
+test_merge_diff.cpp.s:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_merge_diff.dir/build.make tests/CMakeFiles/test_merge_diff.dir/test_merge_diff.cpp.s
+.PHONY : test_merge_diff.cpp.s
+
 test_parser.o: test_parser.cpp.o
 .PHONY : test_parser.o
 
@@ -399,6 +465,54 @@ test_parser.cpp.s:
 	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_parser.dir/build.make tests/CMakeFiles/test_parser.dir/test_parser.cpp.s
 .PHONY : test_parser.cpp.s
 
+test_path_access.o: test_path_access.cpp.o
+.PHONY : test_path_access.o
+
+# target to build an object file
+test_path_access.cpp.o:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_path_access.dir/build.make tests/CMakeFiles/test_path_access.dir/test_path_access.cpp.o
+.PHONY : test_path_access.cpp.o
+
+test_path_access.i: test_path_access.cpp.i
+.PHONY : test_path_access.i
+
+# target to preprocess a source file
+test_path_access.cpp.i:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_path_access.dir/build.make tests/CMakeFiles/test_path_access.dir/test_path_access.cpp.i
+.PHONY : test_path_access.cpp.i
+
+test_path_access.s: test_path_access.cpp.s
+.PHONY : test_path_access.s
+
+# target to generate assembly for a file
+test_path_access.cpp.s:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_path_access.dir/build.make tests/CMakeFiles/test_path_access.dir/test_path_access.cpp.s
+.PHONY : test_path_access.cpp.s
+
+test_yaml.o: test_yaml.cpp.o
+.PHONY : test_yaml.o
+
+# target to build an object file
+test_yaml.cpp.o:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_yaml.dir/build.make tests/CMakeFiles/test_yaml.dir/test_yaml.cpp.o
+.PHONY : test_yaml.cpp.o
+
+test_yaml.i: test_yaml.cpp.i
+.PHONY : test_yaml.i
+
+# target to preprocess a source file
+test_yaml.cpp.i:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_yaml.dir/build.make tests/CMakeFiles/test_yaml.dir/test_yaml.cpp.i
+.PHONY : test_yaml.cpp.i
+
+test_yaml.s: test_yaml.cpp.s
+.PHONY : test_yaml.s
+
+# target to generate assembly for a file
+test_yaml.cpp.s:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_yaml.dir/build.make tests/CMakeFiles/test_yaml.dir/test_yaml.cpp.s
+.PHONY : test_yaml.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -417,7 +531,10 @@ help:
 	@echo "... test_constraints"
 	@echo "... test_conversion"
 	@echo "... test_json"
+	@echo "... test_merge_diff"
 	@echo "... test_parser"
+	@echo "... test_path_access"
+	@echo "... test_yaml"
 	@echo "... test_builder.o"
 	@echo "... test_builder.i"
 	@echo "... test_builder.s"
@@ -433,9 +550,18 @@ help:
 	@echo "... test_json.o"
 	@echo "... test_json.i"
 	@echo "... test_json.s"
+	@echo "... test_merge_diff.o"
+	@echo "... test_merge_diff.i"
+	@echo "... test_merge_diff.s"
 	@echo "... test_parser.o"
 	@echo "... test_parser.i"
 	@echo "... test_parser.s"
+	@echo "... test_path_access.o"
+	@echo "... test_path_access.i"
+	@echo "... test_path_access.s"
+	@echo "... test_yaml.o"
+	@echo "... test_yaml.i"
+	@echo "... test_yaml.s"
 .PHONY : help
 
 

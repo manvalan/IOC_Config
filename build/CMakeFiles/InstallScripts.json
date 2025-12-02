@@ -2,6 +2,7 @@
 	"InstallScripts" : 
 	[
 		"/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/cmake_install.cmake",
+		"/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tools/cmake_install.cmake",
 		"/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/examples/cmake_install.cmake",
 		"/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/cmake_install.cmake"
 	],

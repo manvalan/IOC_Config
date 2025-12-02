@@ -198,6 +198,19 @@ ioc_config_shared/fast:
 .PHONY : ioc_config_shared/fast
 
 #=============================================================================
+# Target rules for targets named ioc-config
+
+# Build rule for target.
+ioc-config: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ioc-config
+.PHONY : ioc-config
+
+# fast build rule for target.
+ioc-config/fast:
+	$(MAKE) $(MAKESILENT) -f tools/CMakeFiles/ioc-config.dir/build.make tools/CMakeFiles/ioc-config.dir/build
+.PHONY : ioc-config/fast
+
+#=============================================================================
 # Target rules for targets named example_basic
 
 # Build rule for target.
@@ -261,6 +274,19 @@ example_builder: cmake_check_build_system
 example_builder/fast:
 	$(MAKE) $(MAKESILENT) -f examples/CMakeFiles/example_builder.dir/build.make examples/CMakeFiles/example_builder.dir/build
 .PHONY : example_builder/fast
+
+#=============================================================================
+# Target rules for targets named example_yaml
+
+# Build rule for target.
+example_yaml: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 example_yaml
+.PHONY : example_yaml
+
+# fast build rule for target.
+example_yaml/fast:
+	$(MAKE) $(MAKESILENT) -f examples/CMakeFiles/example_yaml.dir/build.make examples/CMakeFiles/example_yaml.dir/build
+.PHONY : example_yaml/fast
 
 #=============================================================================
 # Target rules for targets named test_parser
@@ -340,6 +366,45 @@ test_builder_schema/fast:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_builder_schema.dir/build.make tests/CMakeFiles/test_builder_schema.dir/build
 .PHONY : test_builder_schema/fast
 
+#=============================================================================
+# Target rules for targets named test_yaml
+
+# Build rule for target.
+test_yaml: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_yaml
+.PHONY : test_yaml
+
+# fast build rule for target.
+test_yaml/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_yaml.dir/build.make tests/CMakeFiles/test_yaml.dir/build
+.PHONY : test_yaml/fast
+
+#=============================================================================
+# Target rules for targets named test_merge_diff
+
+# Build rule for target.
+test_merge_diff: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_merge_diff
+.PHONY : test_merge_diff
+
+# fast build rule for target.
+test_merge_diff/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_merge_diff.dir/build.make tests/CMakeFiles/test_merge_diff.dir/build
+.PHONY : test_merge_diff/fast
+
+#=============================================================================
+# Target rules for targets named test_path_access
+
+# Build rule for target.
+test_path_access: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_path_access
+.PHONY : test_path_access
+
+# fast build rule for target.
+test_path_access/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_path_access.dir/build.make tests/CMakeFiles/test_path_access.dir/build
+.PHONY : test_path_access/fast
+
 src/oop_parser.o: src/oop_parser.cpp.o
 .PHONY : src/oop_parser.o
 
@@ -385,6 +450,8 @@ help:
 	@echo "... example_config_builder"
 	@echo "... example_converter"
 	@echo "... example_json"
+	@echo "... example_yaml"
+	@echo "... ioc-config"
 	@echo "... ioc_config_shared"
 	@echo "... ioc_config_static"
 	@echo "... test_builder"
@@ -392,7 +459,10 @@ help:
 	@echo "... test_constraints"
 	@echo "... test_conversion"
 	@echo "... test_json"
+	@echo "... test_merge_diff"
 	@echo "... test_parser"
+	@echo "... test_path_access"
+	@echo "... test_yaml"
 	@echo "... src/oop_parser.o"
 	@echo "... src/oop_parser.i"
 	@echo "... src/oop_parser.s"

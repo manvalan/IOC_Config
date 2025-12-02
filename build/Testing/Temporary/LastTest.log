@@ -1,0 +1,389 @@
+Start testing: Dec 02 10:36 CET
+----------------------------------------------------------
+1/8 Testing: ParserTest
+1/8 Test: ParserTest
+Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_parser"
+Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
+"ParserTest" start time: Dec 02 10:36 CET
+Output:
+----------------------------------------------------------
+Running OOP Parser Tests...
+============================= 
+
+Test: Basic OOP file parsing...
+ object.
+         .name = 'TestAsteroid'
+         .id = '999'
+Test: Basic OOP file parsing... PASS
+
+Test: Propagation section...
+ propag.
+         .type = 'RK4'
+         .step_size = 0.05
+Test: Propagation section... PASS
+
+Test: JSON serialization...
+Test: JSON serialization... PASS
+
+============================= 
+All tests PASSED! ✓ 
+<end of output>
+Test time =   0.14 sec
+----------------------------------------------------------
+Test Passed.
+"ParserTest" end time: Dec 02 10:36 CET
+"ParserTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/8 Testing: BuilderTest
+2/8 Test: BuilderTest
+Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_builder"
+Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
+"BuilderTest" start time: Dec 02 10:36 CET
+Output:
+----------------------------------------------------------
+Test: Config builder...
+
+Configuration created with 3 sections
+
+Built sections:
+  object (2 parameters)
+  time (2 parameters)
+  search (2 parameters)
+
+Test: Config builder... PASS
+<end of output>
+Test time =   0.23 sec
+----------------------------------------------------------
+Test Passed.
+"BuilderTest" end time: Dec 02 10:36 CET
+"BuilderTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/8 Testing: ConversionTest
+3/8 Test: ConversionTest
+Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_conversion"
+Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
+"ConversionTest" start time: Dec 02 10:36 CET
+Output:
+----------------------------------------------------------
+Testing OOP <-> JSON Conversion...
+
+Test: OOP -> JSON conversion
+  Conversion failed!
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Failed.
+"ConversionTest" end time: Dec 02 10:36 CET
+"ConversionTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/8 Testing: JsonTest
+4/8 Test: JsonTest
+Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_json"
+Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
+"JsonTest" start time: Dec 02 10:36 CET
+Output:
+----------------------------------------------------------
+IOC_Config - JSON Functionality Tests
+=====================================
+
+=== Test: JSON String Loading ===
+✓ Successfully loaded JSON string
+  Sections: 3
+  - object: 2 params
+  - search: 2 params
+  - time: 2 params
+
+=== Test: JSON String Output ===
+✓ Generated JSON output:
+{
+  "object": {
+    ".id": "17030",
+    ".name": "Asteroid 17030"
+  },
+  "search": {
+    ".max_magnitude": 16.0
+  }
+}
+
+=== Test: JSON Object Conversion ===
+✓ Successfully loaded from JSON object
+✓ Converted back to JSON object
+  Output: {
+  "object": {
+    "id": "17030",
+    "name": "Test Asteroid"
+  },
+  "search": {
+    "max_magnitude": 16.0
+  },
+  "time": {
+    "end_date": "2025-12-02",
+    "start_date": "2025-11-25"
+  }
+}
+
+=== Test: Bidirectional Conversion ===
+
+=== Test: Configuration Validation ===
+✓ Configuration is valid
+
+=====================================
+All JSON tests completed! ✓
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"JsonTest" end time: Dec 02 10:36 CET
+"JsonTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/8 Testing: ConstraintsTest
+5/8 Test: ConstraintsTest
+Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_constraints"
+Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
+"ConstraintsTest" start time: Dec 02 10:36 CET
+Output:
+----------------------------------------------------------
+IOC_Config - Advanced Validation and Constraints Tests
+======================================================
+
+=== Test: Constraint Expression Parsing ===
+                   1..100 -> min=1 (inclusive=1), max=100 (inclusive=1)
+                     1..N -> min=1 (inclusive=1), max=1e+308 (inclusive=1)
+                   d >= 4 -> min=4 (inclusive=1), max=1e+308 (inclusive=1)
+                 d <= 100 -> min=-1e+308 (inclusive=1), max=100 (inclusive=1)
+                    d > 5 -> min=5 (inclusive=0), max=1e+308 (inclusive=1)
+                   d < 30 -> min=-1e+308 (inclusive=1), max=30 (inclusive=0)
+               5 < d < 30 -> min=5 (inclusive=0), max=30 (inclusive=0)
+                0.001..10 -> min=0.001 (inclusive=1), max=10 (inclusive=1)
+
+=== Test: Range Constraints ===
+              1..100 value=    50 -> PASS ✓
+              1..100 value=     0 -> FAIL ✓
+              1..100 value=   101 -> FAIL ✓
+              d >= 4 value=     5 -> PASS ✓
+              d >= 4 value=     4 -> PASS ✓
+              d >= 4 value=     3 -> FAIL ✓
+            d <= 100 value=   100 -> PASS ✓
+            d <= 100 value=   101 -> FAIL ✓
+          5 < d < 30 value=    15 [min=5 inc=0, max=30 inc=0] -> PASS ✓
+          5 < d < 30 value=     5 [min=5 inc=0, max=30 inc=0] -> FAIL ✓
+          5 < d < 30 value=    30 [min=5 inc=0, max=30 inc=0] -> FAIL ✓
+            d < 1000 value=   999 -> PASS ✓
+            d < 1000 value=  1000 -> FAIL ✓
+               d > 0 value=   0.1 -> PASS ✓
+               d > 0 value=     0 -> FAIL ✓
+
+Results: 15 passed, 0 failed
+
+=== Test: Parameter Specifications ===
+Parameter: magnitude
+Required: no
+Constraint: d < 20
+
+Validation results:
+  5.5 -> VALID
+  15 -> VALID
+  20 -> INVALID
+  25 -> INVALID
+
+=== Test: Section Specifications ===
+Section: search
+Required: yes
+Parameters: 2
+  - max_magnitude (required: no)
+  - min_duration_sec (required: no)
+
+=== Test: Schema Validation ===
+Schema: IOoccultCalc Default (v1.0)
+Sections: 5
+  - database (required: no)
+  - object (required: yes)
+  - propag (required: no)
+  - search (required: yes)
+  - time (required: yes)
+
+✓ Configuration is valid against schema
+
+======================================================
+All tests completed! ✓
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"ConstraintsTest" end time: Dec 02 10:36 CET
+"ConstraintsTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/8 Testing: BuilderSchemaTest
+6/8 Test: BuilderSchemaTest
+Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_builder_schema"
+Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
+"BuilderSchemaTest" start time: Dec 02 10:36 CET
+Output:
+----------------------------------------------------------
+
+IOC_Config - ConfigBuilder and Schema Export Tests
+====================================================
+
+=== Test: ConfigBuilder Fluent API ===
+✓ Created 3 sections
+✓ Object section has correct parameters
+✓ Time section has 2 parameters
+
+Section names: object time search 
+
+Test: ConfigBuilder... PASS
+
+=== Test: Method Chaining ===
+✓ Method chaining works correctly
+Test: Method Chaining... PASS
+
+=== Test: Builder Clear ===
+✓ Clear resets builder correctly
+Test: Builder Clear... PASS
+
+=== Test: Schema JSON Export ===
+✓ JSON Schema has correct structure
+✓ JSON Schema contains all sections
+✓ JSON Schema marks required sections
+
+JSON Schema (excerpt):
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "properties": {
+    "database": {
+      "description": "Database configuration",
+      "properties": {},
+      "type": "object"
+    },
+    "object": {
+      "description": "Target object specification",
+      "properties": {
+        "id": {
+          "description": "Object identifier",
+          "type": "string"
+        },
+        "name": {
+          "description": "Object name",
+          "type": "string"
+        }
+      },
+      "requ...
+
+Test: Schema JSON Export... PASS
+
+=== Test: Schema Save to File ===
+✓ Schema saved to /tmp/ioc_schema.json
+✓ File contains valid JSON Schema
+Test: Schema Save to File... PASS
+
+=== Test: Schema JSON with Constraints ===
+✓ Constraints exported to JSON Schema correctly
+
+Constraint property:
+{
+  "constraint": "d < 20",
+  "description": "Maximum magnitude",
+  "exclusiveMaximum": 20.0,
+  "type": "number"
+}
+
+Test: Schema with Constraints... PASS
+
+=== Test: Builder from Existing Parser ===
+✓ Successfully copied section from parser
+✓ New parser has both sections
+Test: Builder from Parser... PASS
+
+====================================================
+All tests completed! ✓
+
+<end of output>
+Test time =   0.24 sec
+----------------------------------------------------------
+Test Passed.
+"BuilderSchemaTest" end time: Dec 02 10:36 CET
+"BuilderSchemaTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/8 Testing: YamlTest
+7/8 Test: YamlTest
+Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_yaml"
+Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
+"YamlTest" start time: Dec 02 10:36 CET
+Output:
+----------------------------------------------------------
+IOC_Config - YAML Support Test Suite
+====================================
+
+⚠ YAML support is NOT enabled
+To enable YAML support:
+  macOS: brew install yaml-cpp
+  Linux: apt-get install libyaml-cpp-dev
+  Then rebuild the project
+
+=== Test 1: Stubs return false gracefully ===
+YAML support not available (yaml-cpp not found)
+YAML support not available (yaml-cpp not found)
+YAML support not available (yaml-cpp not found)
+YAML support not available (yaml-cpp not found)
+✓ PASS: All YAML stubs return gracefully when disabled
+====================================
+Test Results
+====================================
+Passed: 1
+Failed: 0
+Total:  1
+
+✓ All tests passed!
+<end of output>
+Test time =   0.23 sec
+----------------------------------------------------------
+Test Passed.
+"YamlTest" end time: Dec 02 10:36 CET
+"YamlTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/8 Testing: MergeDiffTest
+8/8 Test: MergeDiffTest
+Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_merge_diff"
+Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
+"MergeDiffTest" start time: Dec 02 10:36 CET
+Output:
+----------------------------------------------------------
+
+==================================================
+  Testing Merge, Diff, Clone & Query Operations
+==================================================
+
+Test: Merge with REPLACE strategy... PASS
+Test: Merge with APPEND strategy... PASS
+Test: Diff functionality... PASS
+Test: Diff report generation... PASS
+Test: Diff as JSON... PASS
+Test: Clone functionality... PASS
+Test: copyFrom functionality... PASS
+Test: isEmpty functionality... PASS
+Test: getParametersWhere with predicate... PASS
+Test: getParametersByKeyPattern... PASS
+Test: getParametersByValuePattern... PASS
+Test: getParametersByType... PASS
+
+==================================================
+Results: 12 passed, 0 failed
+All tests PASSED! ✓
+==================================================
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"MergeDiffTest" end time: Dec 02 10:36 CET
+"MergeDiffTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Dec 02 10:36 CET

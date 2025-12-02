@@ -14,6 +14,9 @@
 # EXTERNAL cache entries
 ########################
 
+//Build CLI tool
+BUILD_CLI:BOOL=ON
+
 //Build example programs
 BUILD_EXAMPLES:BOOL=ON
 
@@ -28,7 +31,7 @@ CMAKE_AR:FILEPATH=/usr/bin/ar
 
 //Choose the type of build, options are: None Debug Release RelWithDebInfo
 // MinSizeRel ...
-CMAKE_BUILD_TYPE:STRING=
+CMAKE_BUILD_TYPE:STRING=Release
 
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
@@ -228,8 +231,20 @@ IOC_Config_IS_TOP_LEVEL:STATIC=ON
 //Value Computed by CMake
 IOC_Config_SOURCE_DIR:STATIC=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config
 
+//Arguments to supply to pkg-config
+PKG_CONFIG_ARGN:STRING=
+
+//pkg-config executable
+PKG_CONFIG_EXECUTABLE:FILEPATH=/opt/homebrew/bin/pkg-config
+
 //The directory containing a CMake configuration file for nlohmann_json.
 nlohmann_json_DIR:PATH=/opt/homebrew/share/cmake/nlohmann_json
+
+//The directory containing a CMake configuration file for toml11.
+toml11_DIR:PATH=toml11_DIR-NOTFOUND
+
+//The directory containing a CMake configuration file for yaml-cpp.
+yaml-cpp_DIR:PATH=yaml-cpp_DIR-NOTFOUND
 
 
 ########################
@@ -320,7 +335,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=3
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=4
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -367,4 +382,60 @@ CMAKE_UNAME:INTERNAL=/usr/bin/uname
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding nlohmann_json
 FIND_PACKAGE_MESSAGE_DETAILS_nlohmann_json:INTERNAL=[/opt/homebrew/share/cmake/nlohmann_json/nlohmann_jsonConfig.cmake][v3.12.0()]
+//ADVANCED property for variable: PKG_CONFIG_ARGN
+PKG_CONFIG_ARGN-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: PKG_CONFIG_EXECUTABLE
+PKG_CONFIG_EXECUTABLE-ADVANCED:INTERNAL=1
+__pkg_config_checked_toml11:INTERNAL=1
+__pkg_config_checked_yaml-cpp:INTERNAL=1
+toml11_CFLAGS:INTERNAL=
+toml11_CFLAGS_I:INTERNAL=
+toml11_CFLAGS_OTHER:INTERNAL=
+toml11_FOUND:INTERNAL=
+toml11_INCLUDEDIR:INTERNAL=
+toml11_LIBDIR:INTERNAL=
+toml11_LIBS:INTERNAL=
+toml11_LIBS_L:INTERNAL=
+toml11_LIBS_OTHER:INTERNAL=
+toml11_LIBS_PATHS:INTERNAL=
+toml11_MODULE_NAME:INTERNAL=
+toml11_PREFIX:INTERNAL=
+toml11_STATIC_CFLAGS:INTERNAL=
+toml11_STATIC_CFLAGS_I:INTERNAL=
+toml11_STATIC_CFLAGS_OTHER:INTERNAL=
+toml11_STATIC_LIBDIR:INTERNAL=
+toml11_STATIC_LIBS:INTERNAL=
+toml11_STATIC_LIBS_L:INTERNAL=
+toml11_STATIC_LIBS_OTHER:INTERNAL=
+toml11_STATIC_LIBS_PATHS:INTERNAL=
+toml11_VERSION:INTERNAL=
+toml11_toml11_INCLUDEDIR:INTERNAL=
+toml11_toml11_LIBDIR:INTERNAL=
+toml11_toml11_PREFIX:INTERNAL=
+toml11_toml11_VERSION:INTERNAL=
+yaml-cpp_CFLAGS:INTERNAL=
+yaml-cpp_CFLAGS_I:INTERNAL=
+yaml-cpp_CFLAGS_OTHER:INTERNAL=
+yaml-cpp_FOUND:INTERNAL=
+yaml-cpp_INCLUDEDIR:INTERNAL=
+yaml-cpp_LIBDIR:INTERNAL=
+yaml-cpp_LIBS:INTERNAL=
+yaml-cpp_LIBS_L:INTERNAL=
+yaml-cpp_LIBS_OTHER:INTERNAL=
+yaml-cpp_LIBS_PATHS:INTERNAL=
+yaml-cpp_MODULE_NAME:INTERNAL=
+yaml-cpp_PREFIX:INTERNAL=
+yaml-cpp_STATIC_CFLAGS:INTERNAL=
+yaml-cpp_STATIC_CFLAGS_I:INTERNAL=
+yaml-cpp_STATIC_CFLAGS_OTHER:INTERNAL=
+yaml-cpp_STATIC_LIBDIR:INTERNAL=
+yaml-cpp_STATIC_LIBS:INTERNAL=
+yaml-cpp_STATIC_LIBS_L:INTERNAL=
+yaml-cpp_STATIC_LIBS_OTHER:INTERNAL=
+yaml-cpp_STATIC_LIBS_PATHS:INTERNAL=
+yaml-cpp_VERSION:INTERNAL=
+yaml-cpp_yaml-cpp_INCLUDEDIR:INTERNAL=
+yaml-cpp_yaml-cpp_LIBDIR:INTERNAL=
+yaml-cpp_yaml-cpp_PREFIX:INTERNAL=
+yaml-cpp_yaml-cpp_VERSION:INTERNAL=
 

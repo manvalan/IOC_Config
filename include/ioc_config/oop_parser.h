@@ -747,6 +747,77 @@ public:
      */
     std::vector<ConfigParameter> getParametersByType(const std::string& type) const;
 
+    // ============ Path-Based Access (RFC 6901 JSON Pointer) ============
+
+    /**
+     * @brief Get value by JSON Pointer path (RFC 6901)
+     * 
+     * Supported path formats:
+     *  - "/section/key" → Get parameter value
+     *  - "/section" → Get section (returns JSON representation)
+     *  - "/" → Get root (all sections as JSON)
+     * 
+     * @param path JSON Pointer path
+     * @return Parameter value or empty string if not found
+     */
+    std::string getValueByPath(const std::string& path) const;
+
+    /**
+     * @brief Set value by JSON Pointer path (RFC 6901)
+     * 
+     * Creates intermediate sections if needed.
+     * 
+     * Supported path formats:
+     *  - "/section/key" → Set parameter value
+     *  - "/section" → Create section (empty)
+     * 
+     * @param path JSON Pointer path
+     * @param value Value to set
+     * @return True if successful
+     */
+    bool setValueByPath(const std::string& path, const std::string& value);
+
+    /**
+     * @brief Check if path exists
+     * @param path JSON Pointer path
+     * @return True if path exists
+     */
+    bool hasPath(const std::string& path) const;
+
+    /**
+     * @brief Delete value by path
+     * @param path JSON Pointer path
+     * @return True if successfully deleted
+     */
+    bool deleteByPath(const std::string& path);
+
+    /**
+     * @brief Get all paths in configuration
+     * @return Vector of all valid paths (excluding root)
+     */
+    std::vector<std::string> getAllPaths() const;
+
+    /**
+     * @brief Parse JSON Pointer path into components
+     * @param path Path to parse
+     * @return Vector of path components
+     */
+    static std::vector<std::string> parsePath(const std::string& path);
+
+    /**
+     * @brief Escape special characters in JSON Pointer token
+     * @param token Token to escape
+     * @return Escaped token
+     */
+    static std::string escapePathToken(const std::string& token);
+
+    /**
+     * @brief Unescape special characters in JSON Pointer token
+     * @param token Token to unescape
+     * @return Unescaped token
+     */
+    static std::string unescapePathToken(const std::string& token);
+
 private:
     std::vector<ConfigSectionData> sections_;           ///< Configuration sections
     mutable std::string lastError_;                     ///< Last error message

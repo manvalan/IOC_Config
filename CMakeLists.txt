@@ -90,6 +90,12 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ioc_config.pc
 # Enable testing
 enable_testing()
 
+# Build CLI tool (optional)
+option(BUILD_CLI "Build CLI tool" ON)
+if(BUILD_CLI)
+    add_subdirectory(tools)
+endif()
+
 # Build examples (optional)
 option(BUILD_EXAMPLES "Build example programs" ON)
 if(BUILD_EXAMPLES)
@@ -101,3 +107,4 @@ option(BUILD_TESTS "Build test programs" ON)
 if(BUILD_TESTS)
     add_subdirectory(tests)
 endif()
+

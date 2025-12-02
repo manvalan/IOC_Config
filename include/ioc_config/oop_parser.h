@@ -20,9 +20,85 @@
 #include <memory>
 #include <stdexcept>
 #include <mutex>
+#include <functional>
+#include <regex>
+#include <sstream>
 #include <nlohmann/json.hpp>
 
 namespace ioc_config {
+
+// Forward declarations
+struct MergeConflict;
+
+/**
+ * @brief Merge strategy for combining configurations
+ */
+enum class MergeStrategy {
+    REPLACE = 0,        ///< Incoming values replace existing (default)
+    APPEND = 1,         ///< Append new sections/parameters, keep existing
+    DEEP_MERGE = 2,     ///< Recursive merge for nested structures
+    CUSTOM = 3          ///< Use custom resolver callback
+};
+
+/**
+ * @brief Merge conflict entry for resolver callback
+ */
+struct MergeConflict {
+    std::string section;
+    std::string key;
+    std::string existingValue;
+    std::string incomingValue;
+    std::string resolvedValue;
+    bool resolved;
+};
+
+/**
+ * @brief Statistics from merge operation
+ */
+struct MergeStats {
+    size_t sections_added;
+    size_t sections_updated;
+    size_t parameters_added;
+    size_t parameters_modified;
+    size_t conflicts;
+    std::vector<std::string> conflict_keys;
+
+    MergeStats() : sections_added(0), sections_updated(0), 
+                   parameters_added(0), parameters_modified(0), conflicts(0) {}
+
+    std::string toString() const {
+        std::ostringstream oss;
+        oss << "Sections: +" << sections_added << " modified " << sections_updated
+            << " | Parameters: +" << parameters_added << " modified " << parameters_modified
+            << " | Conflicts: " << conflicts;
+        return oss.str();
+    }
+};
+
+/**
+ * @brief Diff entry for comparing configurations
+ */
+struct DiffEntry {
+    enum Type { ADDED = 0, REMOVED = 1, MODIFIED = 2, UNCHANGED = 3 };
+    
+    Type type;
+    std::string section;
+    std::string key;
+    std::string oldValue;
+    std::string newValue;
+    std::string oldType;
+    std::string newType;
+
+    std::string toString() const {
+        switch (type) {
+            case ADDED: return "[+] " + section + "." + key + " = " + newValue;
+            case REMOVED: return "[-] " + section + "." + key + " (was " + oldValue + ")";
+            case MODIFIED: return "[~] " + section + "." + key + ": " + oldValue + " → " + newValue;
+            case UNCHANGED: return "[=] " + section + "." + key;
+            default: return "[?] unknown";
+        }
+    }
+};
 
 /**
  * @brief Structure to represent a configuration parameter
@@ -556,11 +632,127 @@ public:
      */
     static std::string detectType(const std::string& value);
 
+    // ============ Merge & Diff Operations ============
+
+    /**
+     * @brief Merge another parser into this one
+     * @param other Parser to merge from
+     * @param strategy Merge strategy to use
+     * @return True if successful
+     */
+    bool merge(const OopParser& other, MergeStrategy strategy = MergeStrategy::REPLACE);
+
+    /**
+     * @brief Merge with custom conflict resolution
+     * @param other Parser to merge from
+     * @param resolver Callback function to resolve conflicts
+     * @return True if successful
+     */
+    bool mergeWithResolver(const OopParser& other,
+                          std::function<MergeConflict(const MergeConflict&)> resolver);
+
+    /**
+     * @brief Get statistics from last merge operation
+     * @return Merge statistics
+     */
+    const MergeStats& getLastMergeStats() const;
+
+    /**
+     * @brief Compare this configuration with another
+     * @param other Configuration to compare with
+     * @return Vector of diff entries
+     */
+    std::vector<DiffEntry> diff(const OopParser& other) const;
+
+    /**
+     * @brief Generate human-readable diff report
+     * @param other Configuration to compare with
+     * @param onlyChanges If true, only show changes (not UNCHANGED entries)
+     * @return Formatted diff report string
+     */
+    std::string diffReport(const OopParser& other, bool onlyChanges = true) const;
+
+    /**
+     * @brief Export diff as JSON
+     * @param other Configuration to compare with
+     * @return JSON representation of diff
+     */
+    nlohmann::json diffAsJson(const OopParser& other) const;
+
+    // ============ Cloning & Copying ============
+
+    /**
+     * @brief Create a deep copy of this parser
+     * @return Unique pointer to cloned parser
+     */
+    std::unique_ptr<OopParser> clone() const;
+
+    /**
+     * @brief Copy configuration from another parser
+     * @param other Source parser to copy from
+     * @return Reference to this parser for chaining
+     */
+    OopParser& copyFrom(const OopParser& other);
+
+    /**
+     * @brief Check if parser is empty (no sections)
+     * @return True if no sections
+     */
+    bool isEmpty() const;
+
+    // ============ Query & Filter Operations ============
+
+    /**
+     * @brief Get all parameters matching a predicate
+     * @param predicate Function that returns true for matching parameters
+     * @return Vector of matching parameters
+     */
+    std::vector<ConfigParameter> getParametersWhere(
+        std::function<bool(const ConfigParameter&)> predicate) const;
+
+    /**
+     * @brief Get all sections matching a predicate
+     * @param predicate Function that returns true for matching sections
+     * @return Vector of matching sections
+     */
+    std::vector<ConfigSectionData> getSectionsWhere(
+        std::function<bool(const ConfigSectionData&)> predicate) const;
+
+    /**
+     * @brief Find first parameter matching a predicate
+     * @param predicate Function that returns true for matching parameter
+     * @return Pointer to first matching parameter or nullptr
+     */
+    ConfigParameter* findWhere(std::function<bool(const ConfigParameter&)> predicate);
+    const ConfigParameter* findWhere(std::function<bool(const ConfigParameter&)> predicate) const;
+
+    /**
+     * @brief Get parameters by key pattern (regex)
+     * @param pattern Regular expression pattern for keys
+     * @return Vector of matching parameters
+     */
+    std::vector<ConfigParameter> getParametersByKeyPattern(const std::string& pattern) const;
+
+    /**
+     * @brief Get parameters by value pattern (regex)
+     * @param pattern Regular expression pattern for values
+     * @return Vector of matching parameters
+     */
+    std::vector<ConfigParameter> getParametersByValuePattern(const std::string& pattern) const;
+
+    /**
+     * @brief Get parameters by type
+     * @param type Type to filter by ("string", "int", "float", "bool", "array")
+     * @return Vector of parameters with matching type
+     */
+    std::vector<ConfigParameter> getParametersByType(const std::string& type) const;
+
 private:
     std::vector<ConfigSectionData> sections_;           ///< Configuration sections
     mutable std::string lastError_;                     ///< Last error message
     std::unique_ptr<ConfigSchema> schema_;              ///< Current validation schema
     mutable std::mutex sectionsMutex_;                  ///< Mutex for thread-safe section access
+    MergeStats mergeStats_;                             ///< Statistics from last merge operation
 
     /**
      * @brief Parse a single line from OOP file

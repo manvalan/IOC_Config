@@ -42,3 +42,9 @@ target_link_libraries(test_yaml PRIVATE ioc_config_static)
 target_include_directories(test_yaml PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 add_test(NAME YamlTest COMMAND test_yaml)
 
+# Test 8: Merge, Diff, Clone and Query operations (NEW)
+add_executable(test_merge_diff test_merge_diff.cpp)
+target_link_libraries(test_merge_diff PRIVATE ioc_config_static)
+target_include_directories(test_merge_diff PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+add_test(NAME MergeDiffTest COMMAND test_merge_diff)
+

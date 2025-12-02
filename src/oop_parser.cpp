@@ -1498,6 +1498,402 @@ std::string OopParser::saveToTomlString() const {
 
 #endif
 
+// ============ Merge & Diff Implementation ============
+
+bool OopParser::merge(const OopParser& other, MergeStrategy strategy) {
+    if (strategy == MergeStrategy::CUSTOM) {
+        lastError_ = "CUSTOM strategy requires resolver callback";
+        return false;
+    }
+
+    // Reset statistics
+    mergeStats_ = MergeStats();
+
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+
+    for (const auto& other_section : other.sections_) {
+        auto it = std::find_if(sections_.begin(), sections_.end(),
+            [&](const ConfigSectionData& s) { return s.name == other_section.name; });
+
+        if (it == sections_.end()) {
+            // Section doesn't exist - add it
+            sections_.push_back(other_section);
+            mergeStats_.sections_added++;
+        } else {
+            // Section exists - merge parameters based on strategy
+            if (strategy == MergeStrategy::REPLACE || strategy == MergeStrategy::DEEP_MERGE) {
+                for (const auto& [key, param] : other_section.parameters) {
+                    if (it->parameters.find(key) != it->parameters.end()) {
+                        if (it->parameters[key].value != param.value) {
+                            it->parameters[key] = param;
+                            mergeStats_.parameters_modified++;
+                        }
+                    } else {
+                        it->parameters[key] = param;
+                        mergeStats_.parameters_added++;
+                    }
+                }
+                mergeStats_.sections_updated++;
+            } else if (strategy == MergeStrategy::APPEND) {
+                // Only add new parameters, don't replace existing
+                for (const auto& [key, param] : other_section.parameters) {
+                    if (it->parameters.find(key) == it->parameters.end()) {
+                        it->parameters[key] = param;
+                        mergeStats_.parameters_added++;
+                    }
+                }
+            }
+        }
+    }
+
+    return true;
+}
+
+bool OopParser::mergeWithResolver(const OopParser& other,
+                                  std::function<MergeConflict(const MergeConflict&)> resolver) {
+    if (!resolver) {
+        lastError_ = "Resolver callback cannot be null";
+        return false;
+    }
+
+    mergeStats_ = MergeStats();
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+
+    for (const auto& other_section : other.sections_) {
+        auto it = std::find_if(sections_.begin(), sections_.end(),
+            [&](const ConfigSectionData& s) { return s.name == other_section.name; });
+
+        if (it == sections_.end()) {
+            sections_.push_back(other_section);
+            mergeStats_.sections_added++;
+        } else {
+            for (const auto& [key, param] : other_section.parameters) {
+                auto existing = it->parameters.find(key);
+                if (existing != it->parameters.end() && existing->second.value != param.value) {
+                    // Conflict detected - use resolver
+                    MergeConflict conflict;
+                    conflict.section = other_section.name;
+                    conflict.key = key;
+                    conflict.existingValue = existing->second.value;
+                    conflict.incomingValue = param.value;
+                    conflict.resolvedValue = param.value;
+                    conflict.resolved = false;
+
+                    auto resolved = resolver(conflict);
+                    if (resolved.resolved) {
+                        existing->second.value = resolved.resolvedValue;
+                        mergeStats_.parameters_modified++;
+                    } else {
+                        mergeStats_.conflicts++;
+                        mergeStats_.conflict_keys.push_back(key);
+                    }
+                } else if (existing == it->parameters.end()) {
+                    it->parameters[key] = param;
+                    mergeStats_.parameters_added++;
+                }
+            }
+            mergeStats_.sections_updated++;
+        }
+    }
+
+    return mergeStats_.conflicts == 0;
+}
+
+const MergeStats& OopParser::getLastMergeStats() const {
+    return mergeStats_;
+}
+
+std::vector<DiffEntry> OopParser::diff(const OopParser& other) const {
+    std::vector<DiffEntry> diffs;
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+
+    // Check for sections in this but not in other (REMOVED)
+    for (const auto& section : sections_) {
+        auto other_section = std::find_if(other.sections_.begin(), other.sections_.end(),
+            [&](const ConfigSectionData& s) { return s.name == section.name; });
+
+        if (other_section == other.sections_.end()) {
+            for (const auto& [key, param] : section.parameters) {
+                DiffEntry entry;
+                entry.type = DiffEntry::REMOVED;
+                entry.section = section.name;
+                entry.key = key;
+                entry.oldValue = param.value;
+                entry.oldType = param.type;
+                diffs.push_back(entry);
+            }
+        } else {
+            // Check individual parameters
+            for (const auto& [key, param] : section.parameters) {
+                auto other_param = other_section->parameters.find(key);
+                if (other_param == other_section->parameters.end()) {
+                    // Parameter removed
+                    DiffEntry entry;
+                    entry.type = DiffEntry::REMOVED;
+                    entry.section = section.name;
+                    entry.key = key;
+                    entry.oldValue = param.value;
+                    entry.oldType = param.type;
+                    diffs.push_back(entry);
+                } else if (other_param->second.value != param.value) {
+                    // Parameter modified
+                    DiffEntry entry;
+                    entry.type = DiffEntry::MODIFIED;
+                    entry.section = section.name;
+                    entry.key = key;
+                    entry.oldValue = param.value;
+                    entry.newValue = other_param->second.value;
+                    entry.oldType = param.type;
+                    entry.newType = other_param->second.type;
+                    diffs.push_back(entry);
+                } else {
+                    // Unchanged
+                    DiffEntry entry;
+                    entry.type = DiffEntry::UNCHANGED;
+                    entry.section = section.name;
+                    entry.key = key;
+                    entry.oldValue = param.value;
+                    entry.oldType = param.type;
+                    diffs.push_back(entry);
+                }
+            }
+
+            // Check for added parameters
+            for (const auto& [key, param] : other_section->parameters) {
+                if (section.parameters.find(key) == section.parameters.end()) {
+                    DiffEntry entry;
+                    entry.type = DiffEntry::ADDED;
+                    entry.section = section.name;
+                    entry.key = key;
+                    entry.newValue = param.value;
+                    entry.newType = param.type;
+                    diffs.push_back(entry);
+                }
+            }
+        }
+    }
+
+    // Check for sections in other but not in this (ADDED)
+    for (const auto& other_section : other.sections_) {
+        auto section = std::find_if(sections_.begin(), sections_.end(),
+            [&](const ConfigSectionData& s) { return s.name == other_section.name; });
+
+        if (section == sections_.end()) {
+            for (const auto& [key, param] : other_section.parameters) {
+                DiffEntry entry;
+                entry.type = DiffEntry::ADDED;
+                entry.section = other_section.name;
+                entry.key = key;
+                entry.newValue = param.value;
+                entry.newType = param.type;
+                diffs.push_back(entry);
+            }
+        }
+    }
+
+    return diffs;
+}
+
+std::string OopParser::diffReport(const OopParser& other, bool onlyChanges) const {
+    auto diffs = diff(other);
+    std::ostringstream oss;
+
+    oss << "=== Configuration Diff Report ===\n";
+    
+    size_t added = 0, removed = 0, modified = 0, unchanged = 0;
+
+    for (const auto& entry : diffs) {
+        if (onlyChanges && entry.type == DiffEntry::UNCHANGED) {
+            unchanged++;
+            continue;
+        }
+
+        oss << entry.toString() << "\n";
+
+        if (entry.type == DiffEntry::ADDED) added++;
+        else if (entry.type == DiffEntry::REMOVED) removed++;
+        else if (entry.type == DiffEntry::MODIFIED) modified++;
+        else unchanged++;
+    }
+
+    oss << "\n--- Summary ---\n";
+    oss << "Added: " << added << "\n";
+    oss << "Removed: " << removed << "\n";
+    oss << "Modified: " << modified << "\n";
+    if (!onlyChanges) oss << "Unchanged: " << unchanged << "\n";
+
+    return oss.str();
+}
+
+nlohmann::json OopParser::diffAsJson(const OopParser& other) const {
+    auto diffs = diff(other);
+    json result = json::array();
+
+    for (const auto& entry : diffs) {
+        json diff_obj;
+        diff_obj["type"] = [](DiffEntry::Type t) {
+            switch (t) {
+                case DiffEntry::ADDED: return "added";
+                case DiffEntry::REMOVED: return "removed";
+                case DiffEntry::MODIFIED: return "modified";
+                case DiffEntry::UNCHANGED: return "unchanged";
+                default: return "unknown";
+            }
+        }(entry.type);
+        diff_obj["section"] = entry.section;
+        diff_obj["key"] = entry.key;
+        if (!entry.oldValue.empty()) diff_obj["old_value"] = entry.oldValue;
+        if (!entry.newValue.empty()) diff_obj["new_value"] = entry.newValue;
+        if (!entry.oldType.empty()) diff_obj["old_type"] = entry.oldType;
+        if (!entry.newType.empty()) diff_obj["new_type"] = entry.newType;
+        
+        result.push_back(diff_obj);
+    }
+
+    return result;
+}
+
+// ============ Cloning & Copying Implementation ============
+
+std::unique_ptr<OopParser> OopParser::clone() const {
+    auto cloned = std::make_unique<OopParser>();
+    cloned->copyFrom(*this);
+    return cloned;
+}
+
+OopParser& OopParser::copyFrom(const OopParser& other) {
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+    
+    sections_ = other.sections_;
+    lastError_ = other.lastError_;
+    if (other.schema_) {
+        schema_ = std::make_unique<ConfigSchema>(*other.schema_);
+    }
+    mergeStats_ = other.mergeStats_;
+
+    return *this;
+}
+
+bool OopParser::isEmpty() const {
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+    return sections_.empty();
+}
+
+// ============ Query & Filter Implementation ============
+
+std::vector<ConfigParameter> OopParser::getParametersWhere(
+    std::function<bool(const ConfigParameter&)> predicate) const {
+    std::vector<ConfigParameter> results;
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+
+    for (const auto& section : sections_) {
+        for (const auto& [key, param] : section.parameters) {
+            if (predicate(param)) {
+                results.push_back(param);
+            }
+        }
+    }
+
+    return results;
+}
+
+std::vector<ConfigSectionData> OopParser::getSectionsWhere(
+    std::function<bool(const ConfigSectionData&)> predicate) const {
+    std::vector<ConfigSectionData> results;
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+
+    for (const auto& section : sections_) {
+        if (predicate(section)) {
+            results.push_back(section);
+        }
+    }
+
+    return results;
+}
+
+ConfigParameter* OopParser::findWhere(std::function<bool(const ConfigParameter&)> predicate) {
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+
+    for (auto& section : sections_) {
+        for (auto& [key, param] : section.parameters) {
+            if (predicate(param)) {
+                return &param;
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+const ConfigParameter* OopParser::findWhere(std::function<bool(const ConfigParameter&)> predicate) const {
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+
+    for (const auto& section : sections_) {
+        for (const auto& [key, param] : section.parameters) {
+            if (predicate(param)) {
+                return &param;
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+std::vector<ConfigParameter> OopParser::getParametersByKeyPattern(const std::string& pattern) const {
+    std::vector<ConfigParameter> results;
+    try {
+        std::regex key_regex(pattern, std::regex::icase);
+        std::lock_guard<std::mutex> lock(sectionsMutex_);
+
+        for (const auto& section : sections_) {
+            for (const auto& [key, param] : section.parameters) {
+                if (std::regex_search(key, key_regex)) {
+                    results.push_back(param);
+                }
+            }
+        }
+    } catch (const std::regex_error& e) {
+        lastError_ = std::string("Invalid regex pattern: ") + e.what();
+    }
+
+    return results;
+}
+
+std::vector<ConfigParameter> OopParser::getParametersByValuePattern(const std::string& pattern) const {
+    std::vector<ConfigParameter> results;
+    try {
+        std::regex value_regex(pattern, std::regex::icase);
+        std::lock_guard<std::mutex> lock(sectionsMutex_);
+
+        for (const auto& section : sections_) {
+            for (const auto& [key, param] : section.parameters) {
+                if (std::regex_search(param.value, value_regex)) {
+                    results.push_back(param);
+                }
+            }
+        }
+    } catch (const std::regex_error& e) {
+        lastError_ = std::string("Invalid regex pattern: ") + e.what();
+    }
+
+    return results;
+}
+
+std::vector<ConfigParameter> OopParser::getParametersByType(const std::string& type) const {
+    std::vector<ConfigParameter> results;
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+
+    for (const auto& section : sections_) {
+        for (const auto& [key, param] : section.parameters) {
+            if (param.type == type) {
+                results.push_back(param);
+            }
+        }
+    }
+
+    return results;
+}
+
 // ============ Utility Functions ============
 
 bool convertOopToJson(const std::string& oopFilepath, 

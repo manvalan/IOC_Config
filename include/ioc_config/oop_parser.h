@@ -475,6 +475,35 @@ public:
      */
     std::string toJsonString(int indent = 2) const;
 
+    // ============ YAML Support Methods ============
+    
+    /**
+     * @brief Load configuration from YAML file
+     * @param filepath Path to YAML file
+     * @return True if successful
+     */
+    bool loadFromYaml(const std::string& filepath);
+
+    /**
+     * @brief Save configuration to YAML file
+     * @param filepath Path to YAML file to create/overwrite
+     * @return True if successful
+     */
+    bool saveToYaml(const std::string& filepath) const;
+
+    /**
+     * @brief Load configuration from YAML string
+     * @param yamlString YAML formatted string
+     * @return True if successful
+     */
+    bool loadFromYamlString(const std::string& yamlString);
+
+    /**
+     * @brief Get configuration as YAML string
+     * @return YAML formatted string
+     */
+    std::string saveToYamlString() const;
+
     /**
      * @brief Trim whitespace from string (static utility)
      * @param str String to trim
@@ -530,6 +559,15 @@ private:
      * @return Vector of parsed array elements
      */
     static std::vector<std::string> parseArrayValue(const std::string& value);
+
+#ifdef IOC_CONFIG_YAML_SUPPORT
+    /**
+     * @brief Parse a YAML node into configuration sections
+     * @param config YAML node to parse
+     * @return True if parsing was successful
+     */
+    bool loadFromYamlNode(const YAML::Node& config);
+#endif
 };
 
 /**

@@ -23,6 +23,23 @@ endif()
 # Find nlohmann_json
 find_package(nlohmann_json REQUIRED)
 
+# Find yaml-cpp (optional, for YAML support)
+find_package(yaml-cpp CONFIG QUIET)
+if(NOT yaml-cpp_FOUND)
+    message(STATUS "yaml-cpp not found via find_package, trying pkg-config...")
+    find_package(PkgConfig QUIET)
+    if(PkgConfig_FOUND)
+        pkg_check_modules(yaml-cpp yaml-cpp)
+    endif()
+endif()
+
+if(yaml-cpp_FOUND)
+    message(STATUS "yaml-cpp found, YAML support will be enabled")
+else()
+    message(WARNING "yaml-cpp not found, YAML support will be disabled")
+    message(STATUS "To install yaml-cpp: brew install yaml-cpp (macOS) or apt-get install libyaml-cpp-dev (Linux)")
+endif()
+
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
@@ -34,11 +51,19 @@ set(SOURCES
 # Create static library
 add_library(ioc_config_static STATIC ${SOURCES})
 target_link_libraries(ioc_config_static PUBLIC nlohmann_json::nlohmann_json)
+if(yaml-cpp_FOUND)
+    target_link_libraries(ioc_config_static PUBLIC yaml-cpp::yaml-cpp)
+    target_compile_definitions(ioc_config_static PRIVATE IOC_CONFIG_YAML_SUPPORT)
+endif()
 set_target_properties(ioc_config_static PROPERTIES OUTPUT_NAME ioc_config)
 
 # Create shared library
 add_library(ioc_config_shared SHARED ${SOURCES})
 target_link_libraries(ioc_config_shared PUBLIC nlohmann_json::nlohmann_json)
+if(yaml-cpp_FOUND)
+    target_link_libraries(ioc_config_shared PUBLIC yaml-cpp::yaml-cpp)
+    target_compile_definitions(ioc_config_shared PRIVATE IOC_CONFIG_YAML_SUPPORT)
+endif()
 set_target_properties(ioc_config_shared PROPERTIES OUTPUT_NAME ioc_config)
 
 # Add version info

@@ -14,12 +14,18 @@
 #include "ioc_config/oop_parser.h"
 #include <fstream>
 #include <sstream>
+#include <iostream>
 #include <algorithm>
 #include <cctype>
 #include <cmath>
 
 // Include nlohmann/json for JSON support
 #include <nlohmann/json.hpp>
+
+// Include yaml-cpp for YAML support (if available)
+#ifdef IOC_CONFIG_YAML_SUPPORT
+#include <yaml-cpp/yaml.h>
+#endif
 
 using json = nlohmann::json;
 
@@ -1147,6 +1153,136 @@ std::vector<std::string> ConfigBuilder::getSectionNames() const {
     }
     return names;
 }
+
+// ============ YAML Support Methods ============
+
+#ifdef IOC_CONFIG_YAML_SUPPORT
+
+bool OopParser::loadFromYaml(const std::string& filepath) {
+    try {
+        std::ifstream file(filepath);
+        if (!file.is_open()) {
+            return false;
+        }
+        
+        YAML::Node config = YAML::LoadFile(filepath);
+        return loadFromYamlNode(config);
+    } catch (const std::exception& e) {
+        std::cerr << "YAML load error: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool OopParser::saveToYaml(const std::string& filepath) const {
+    try {
+        YAML::Node config;
+        
+        // Convert sections to YAML
+        for (const auto& section : sections_) {
+            YAML::Node sectionNode;
+            
+            for (const auto& param : section.parameters) {
+                sectionNode[param.key] = param.value;
+            }
+            
+            config[section.name] = sectionNode;
+        }
+        
+        std::ofstream file(filepath);
+        if (!file.is_open()) {
+            return false;
+        }
+        
+        file << config;
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "YAML save error: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool OopParser::loadFromYamlString(const std::string& yamlString) {
+    try {
+        YAML::Node config = YAML::Load(yamlString);
+        return loadFromYamlNode(config);
+    } catch (const std::exception& e) {
+        std::cerr << "YAML parse error: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+std::string OopParser::saveToYamlString() const {
+    try {
+        YAML::Node config;
+        
+        // Convert sections to YAML
+        for (const auto& section : sections_) {
+            YAML::Node sectionNode;
+            
+            for (const auto& param : section.parameters) {
+                sectionNode[param.key] = param.value;
+            }
+            
+            config[section.name] = sectionNode;
+        }
+        
+        YAML::Emitter emitter;
+        emitter << config;
+        return emitter.c_str();
+    } catch (const std::exception& e) {
+        std::cerr << "YAML format error: " << e.what() << std::endl;
+        return "";
+    }
+}
+
+// Helper method to load from YAML node
+bool OopParser::loadFromYamlNode(const YAML::Node& config) {
+    try {
+        for (YAML::const_iterator it = config.begin(); it != config.end(); ++it) {
+            std::string sectionName = it->first.as<std::string>();
+            const YAML::Node& sectionNode = it->second;
+            
+            if (sectionNode.IsMap()) {
+                for (YAML::const_iterator paramIt = sectionNode.begin(); 
+                     paramIt != sectionNode.end(); ++paramIt) {
+                    std::string paramKey = paramIt->first.as<std::string>();
+                    std::string paramValue = paramIt->second.as<std::string>();
+                    
+                    setParameter(sectionName, paramKey, paramValue);
+                }
+            }
+        }
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "YAML node load error: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+#else
+
+// Stub implementations when YAML support is disabled
+bool OopParser::loadFromYaml(const std::string& filepath) {
+    std::cerr << "YAML support not available (yaml-cpp not found)" << std::endl;
+    return false;
+}
+
+bool OopParser::saveToYaml(const std::string& filepath) const {
+    std::cerr << "YAML support not available (yaml-cpp not found)" << std::endl;
+    return false;
+}
+
+bool OopParser::loadFromYamlString(const std::string& yamlString) {
+    std::cerr << "YAML support not available (yaml-cpp not found)" << std::endl;
+    return false;
+}
+
+std::string OopParser::saveToYamlString() const {
+    std::cerr << "YAML support not available (yaml-cpp not found)" << std::endl;
+    return "";
+}
+
+#endif
 
 // ============ Utility Functions ============
 

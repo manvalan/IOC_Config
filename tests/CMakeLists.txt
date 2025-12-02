@@ -36,3 +36,9 @@ target_link_libraries(test_builder_schema PRIVATE ioc_config_static)
 target_include_directories(test_builder_schema PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 add_test(NAME BuilderSchemaTest COMMAND test_builder_schema)
 
+# Test 7: YAML functionality
+add_executable(test_yaml test_yaml.cpp)
+target_link_libraries(test_yaml PRIVATE ioc_config_static)
+target_include_directories(test_yaml PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+add_test(NAME YamlTest COMMAND test_yaml)
+

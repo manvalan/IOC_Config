@@ -25,3 +25,8 @@ add_executable(example_builder builder_example.cpp)
 target_link_libraries(example_builder PRIVATE ioc_config_static)
 target_include_directories(example_builder PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
+# Example 6: YAML configuration
+add_executable(example_yaml yaml_config_example.cpp)
+target_link_libraries(example_yaml PRIVATE ioc_config_static)
+target_include_directories(example_yaml PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+

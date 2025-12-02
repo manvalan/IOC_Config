@@ -27,6 +27,11 @@
 #include <yaml-cpp/yaml.h>
 #endif
 
+// Include toml11 for TOML support (if available)
+#ifdef IOC_CONFIG_TOML_SUPPORT
+#include <toml.hpp>
+#endif
+
 using json = nlohmann::json;
 
 namespace ioc_config {
@@ -1284,6 +1289,210 @@ bool OopParser::loadFromYamlString(const std::string& yamlString) {
 
 std::string OopParser::saveToYamlString() const {
     std::cerr << "YAML support not available (yaml-cpp not found)" << std::endl;
+    return "";
+}
+
+#endif
+
+#ifdef IOC_CONFIG_TOML_SUPPORT
+
+bool OopParser::loadFromToml(const std::string& filepath) {
+    try {
+        std::lock_guard<std::mutex> lock(sectionsMutex_);
+        
+        clear();
+        const auto data = toml::parse(filepath);
+        
+        for (const auto& [section_name, section_value] : data) {
+            ConfigSectionData section;
+            section.name = section_name;
+            section.type = ConfigSectionData::stringToSectionType(section_name);
+            
+            if (section_value.is_table()) {
+                for (const auto& [key, value] : *section_value.as_table()) {
+                    ConfigParameter param;
+                    param.key = "." + key;
+                    
+                    if (value.is_string()) {
+                        param.value = value.as_string();
+                        param.type = "string";
+                    } else if (value.is_integer()) {
+                        param.value = std::to_string(value.as_integer());
+                        param.type = "int";
+                    } else if (value.is_floating()) {
+                        param.value = std::to_string(value.as_floating());
+                        param.type = "float";
+                    } else if (value.is_boolean()) {
+                        param.value = value.as_boolean() ? "true" : "false";
+                        param.type = "bool";
+                    }
+                    
+                    section.parameters[param.key] = param;
+                }
+            }
+            
+            if (!section.parameters.empty()) {
+                sections_.push_back(section);
+            }
+        }
+        
+        return true;
+    } catch (const std::exception& e) {
+        lastError_ = "TOML parsing error: " + std::string(e.what());
+        std::cerr << lastError_ << "\n";
+        return false;
+    }
+}
+
+bool OopParser::saveToToml(const std::string& filepath) const {
+    try {
+        toml::table root;
+        
+        for (const auto& section : sections_) {
+            toml::table section_table;
+            
+            for (const auto& [key, param] : section.parameters) {
+                std::string clean_key = key;
+                if (clean_key[0] == '.') {
+                    clean_key = clean_key.substr(1);
+                }
+                
+                if (param.type == "int") {
+                    section_table.insert(clean_key, std::stoll(param.value));
+                } else if (param.type == "float") {
+                    section_table.insert(clean_key, std::stod(param.value));
+                } else if (param.type == "bool") {
+                    section_table.insert(clean_key, param.value == "true");
+                } else {
+                    section_table.insert(clean_key, param.value);
+                }
+            }
+            
+            root.insert(section.name, section_table);
+        }
+        
+        std::ofstream file(filepath);
+        if (!file.is_open()) {
+            lastError_ = "Cannot open file for writing: " + filepath;
+            return false;
+        }
+        
+        file << root;
+        file.close();
+        
+        return true;
+    } catch (const std::exception& e) {
+        lastError_ = "TOML export error: " + std::string(e.what());
+        std::cerr << lastError_ << "\n";
+        return false;
+    }
+}
+
+bool OopParser::loadFromTomlString(const std::string& tomlString) {
+    try {
+        std::lock_guard<std::mutex> lock(sectionsMutex_);
+        
+        clear();
+        std::istringstream stream(tomlString);
+        const auto data = toml::parse(stream);
+        
+        for (const auto& [section_name, section_value] : data) {
+            ConfigSectionData section;
+            section.name = section_name;
+            section.type = ConfigSectionData::stringToSectionType(section_name);
+            
+            if (section_value.is_table()) {
+                for (const auto& [key, value] : *section_value.as_table()) {
+                    ConfigParameter param;
+                    param.key = "." + key;
+                    
+                    if (value.is_string()) {
+                        param.value = value.as_string();
+                        param.type = "string";
+                    } else if (value.is_integer()) {
+                        param.value = std::to_string(value.as_integer());
+                        param.type = "int";
+                    } else if (value.is_floating()) {
+                        param.value = std::to_string(value.as_floating());
+                        param.type = "float";
+                    } else if (value.is_boolean()) {
+                        param.value = value.as_boolean() ? "true" : "false";
+                        param.type = "bool";
+                    }
+                    
+                    section.parameters[param.key] = param;
+                }
+            }
+            
+            if (!section.parameters.empty()) {
+                sections_.push_back(section);
+            }
+        }
+        
+        return true;
+    } catch (const std::exception& e) {
+        lastError_ = "TOML parsing error: " + std::string(e.what());
+        std::cerr << lastError_ << "\n";
+        return false;
+    }
+}
+
+std::string OopParser::saveToTomlString() const {
+    try {
+        toml::table root;
+        
+        for (const auto& section : sections_) {
+            toml::table section_table;
+            
+            for (const auto& [key, param] : section.parameters) {
+                std::string clean_key = key;
+                if (clean_key[0] == '.') {
+                    clean_key = clean_key.substr(1);
+                }
+                
+                if (param.type == "int") {
+                    section_table.insert(clean_key, std::stoll(param.value));
+                } else if (param.type == "float") {
+                    section_table.insert(clean_key, std::stod(param.value));
+                } else if (param.type == "bool") {
+                    section_table.insert(clean_key, param.value == "true");
+                } else {
+                    section_table.insert(clean_key, param.value);
+                }
+            }
+            
+            root.insert(section.name, section_table);
+        }
+        
+        std::ostringstream oss;
+        oss << root;
+        return oss.str();
+    } catch (const std::exception& e) {
+        return "";
+    }
+}
+
+#else
+
+// Stub implementations when TOML support is disabled
+bool OopParser::loadFromToml(const std::string&) {
+    lastError_ = "TOML support not available (toml11 not found)";
+    std::cerr << lastError_ << "\n";
+    return false;
+}
+
+bool OopParser::saveToToml(const std::string&) const {
+    std::cerr << "TOML support not available (toml11 not found)\n";
+    return false;
+}
+
+bool OopParser::loadFromTomlString(const std::string&) {
+    lastError_ = "TOML support not available (toml11 not found)";
+    std::cerr << lastError_ << "\n";
+    return false;
+}
+
+std::string OopParser::saveToTomlString() const {
     return "";
 }
 

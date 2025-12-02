@@ -421,18 +421,63 @@ public:
      */
     std::string getLastError() const;
 
-    /**
-     * @brief Load configuration from JSON string
-     * @param jsonString JSON string containing configuration
-     * @return True if successful, false otherwise
-     */
-    bool loadFromJsonString(const std::string& jsonString);
+    // ============ YAML Support Methods ============
 
     /**
-     * @brief Save configuration to JSON string
-     * @return JSON string representation of configuration
+     * @brief Load configuration from YAML file
+     * @param filepath Path to YAML file
+     * @return True if successful
      */
-    std::string saveToJsonString() const;
+    bool loadFromYaml(const std::string& filepath);
+
+    /**
+     * @brief Save configuration to YAML file
+     * @param filepath Path to YAML file to create/overwrite
+     * @return True if successful
+     */
+    bool saveToYaml(const std::string& filepath) const;
+
+    /**
+     * @brief Load configuration from YAML string
+     * @param yamlString YAML string containing configuration
+     * @return True if successful, false otherwise
+     */
+    bool loadFromYamlString(const std::string& yamlString);
+
+    /**
+     * @brief Save configuration to YAML string
+     * @return YAML string representation of configuration
+     */
+    std::string saveToYamlString() const;
+
+    // ============ TOML Support Methods ============
+
+    /**
+     * @brief Load configuration from TOML file
+     * @param filepath Path to the TOML configuration file
+     * @return True if successful, false otherwise
+     */
+    bool loadFromToml(const std::string& filepath);
+
+    /**
+     * @brief Save configuration to TOML file
+     * @param filepath Path where to save the TOML configuration file
+     * @return True if successful, false otherwise
+     */
+    bool saveToToml(const std::string& filepath) const;
+
+    /**
+     * @brief Load configuration from TOML string
+     * @param tomlString TOML string containing configuration
+     * @return True if successful, false otherwise
+     */
+    bool loadFromTomlString(const std::string& tomlString);
+
+    /**
+     * @brief Save configuration to TOML string
+     * @return TOML string representation of configuration
+     */
+    std::string saveToTomlString() const;
 
     /**
      * @brief Load configuration from JSON object
@@ -476,34 +521,18 @@ public:
      */
     std::string toJsonString(int indent = 2) const;
 
-    // ============ YAML Support Methods ============
-    
     /**
-     * @brief Load configuration from YAML file
-     * @param filepath Path to YAML file
-     * @return True if successful
+     * @brief Load configuration from JSON string
+     * @param jsonString JSON string containing configuration
+     * @return True if successful, false otherwise
      */
-    bool loadFromYaml(const std::string& filepath);
+    bool loadFromJsonString(const std::string& jsonString);
 
     /**
-     * @brief Save configuration to YAML file
-     * @param filepath Path to YAML file to create/overwrite
-     * @return True if successful
+     * @brief Save configuration to JSON string
+     * @return JSON string representation of configuration
      */
-    bool saveToYaml(const std::string& filepath) const;
-
-    /**
-     * @brief Load configuration from YAML string
-     * @param yamlString YAML formatted string
-     * @return True if successful
-     */
-    bool loadFromYamlString(const std::string& yamlString);
-
-    /**
-     * @brief Get configuration as YAML string
-     * @return YAML formatted string
-     */
-    std::string saveToYamlString() const;
+    std::string saveToJsonString() const;
 
     /**
      * @brief Trim whitespace from string (static utility)

@@ -95,6 +95,57 @@ bool RangeConstraint::parseExpression(const std::string& expr) {
         }
     }
 
+    // Case 3: "5 < d < 30" or "30 > d > 5" (DOUBLE INEQUALITIES)
+    // Check this BEFORE Case 2 to avoid ambiguity
+    size_t d_pos = trimmed.find('d');
+    if (d_pos != std::string::npos && d_pos > 0 && d_pos < trimmed.length() - 1) {
+        // Look for comparison operators on both sides of 'd'
+        std::string before_d = trimmed.substr(0, d_pos);
+        std::string after_d = trimmed.substr(d_pos + 1);
+        
+        // Check if both sides end/start with a comparison operator
+        char op_before = before_d.empty() ? '\0' : before_d.back();
+        char op_after = after_d.empty() ? '\0' : after_d.front();
+        
+        if ((op_before == '<' || op_before == '>') && (op_after == '<' || op_after == '>')) {
+            // This is a double inequality
+            try {
+                // Extract the numbers
+                size_t len_before = (op_before == '<' || op_before == '>') ? 1 : 0;
+                size_t len_after = (op_after == '<' || op_after == '>') ? 1 : 0;
+                
+                std::string min_str = before_d.substr(0, before_d.length() - len_before);
+                std::string max_str = after_d.substr(len_after);
+                
+                double min_val = std::stod(min_str);
+                double max_val = std::stod(max_str);
+                
+                // Determine inclusivity based on operators
+                // "5 < d" means min is exclusive; "5 <= d" means min is inclusive
+                // "d < 30" means max is exclusive; "d <= 30" means max is inclusive
+                bool min_is_less_than = (op_before == '<');
+                bool max_is_less_than = (op_after == '<');
+                
+                min_value = min_val;
+                max_value = max_val;
+                min_inclusive = !min_is_less_than;  // If "<", exclusive. If ">", it's the wrong operator (swap values)
+                max_inclusive = !max_is_less_than;  // If "<", exclusive. If ">", should not happen in "5 < d < 30"
+                
+                // Special case: if pattern is "30 > d > 5", swap and adjust
+                if (op_before == '>') {
+                    std::swap(min_value, max_value);
+                    min_inclusive = true;  // "30 > d" means d can equal 30
+                    max_inclusive = true;  // "d > 5" means d can equal 5
+                }
+                
+                enabled = true;
+                return true;
+            } catch (...) {
+                // Fall through to Case 2
+            }
+        }
+    }
+
     // Case 2: "d >= 4", "d <= 100", "d > 5", "d < 1000"
     if (trimmed.find("d>=") != std::string::npos) {
         try {
@@ -142,27 +193,6 @@ bool RangeConstraint::parseExpression(const std::string& expr) {
             return true;
         } catch (...) {
             return false;
-        }
-    }
-
-    // Case 3: "5 < d < 30"
-    size_t first_lt = trimmed.find('<');
-    if (first_lt != std::string::npos) {
-        size_t second_lt = trimmed.find('<', first_lt + 1);
-        if (second_lt != std::string::npos) {
-            try {
-                std::string min_str = trimmed.substr(0, first_lt);
-                std::string max_str = trimmed.substr(second_lt + 1);
-                
-                min_value = std::stod(min_str);
-                max_value = std::stod(max_str);
-                min_inclusive = false;
-                max_inclusive = false;
-                enabled = true;
-                return true;
-            } catch (...) {
-                return false;
-            }
         }
     }
 

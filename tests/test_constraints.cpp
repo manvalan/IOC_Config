@@ -42,8 +42,15 @@ void testRangeConstraints() {
             bool success = (result == test.expected);
             
             std::cout << std::setw(20) << test.expr 
-                     << " value=" << std::setw(6) << test.test_value
-                     << " -> " << (result ? "PASS" : "FAIL")
+                     << " value=" << std::setw(6) << test.test_value;
+            
+            // Debug: show parsed constraint details for double inequalities
+            if (test.expr.find('<') != std::string::npos && test.expr.find('<', test.expr.find('<') + 1) != std::string::npos) {
+                std::cout << " [min=" << constraint.min_value << " inc=" << constraint.min_inclusive 
+                         << ", max=" << constraint.max_value << " inc=" << constraint.max_inclusive << "]";
+            }
+            
+            std::cout << " -> " << (result ? "PASS" : "FAIL")
                      << (success ? " ✓" : " ✗ MISMATCH")
                      << "\n";
             

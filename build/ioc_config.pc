@@ -5,7 +5,7 @@ includedir=${prefix}/include
 
 Name: IOC_Config
 Description: OOP File Parser Library - OrbFit-style configuration file parser
-Version: 1.0.0
+Version: 1.2.0
 Libs: -L${libdir} -lioc_config
 Cflags: -I${includedir}
 Requires: nlohmann_json

@@ -41,6 +41,7 @@
 /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/test_csv.dir
 /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/test_batch.dir
 /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/test_streaming.dir
+/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/test_versioning.dir
 /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/test.dir
 /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/edit_cache.dir
 /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/rebuild_cache.dir

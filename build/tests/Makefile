@@ -353,6 +353,20 @@ test_streaming/fast:
 	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_streaming.dir/build.make tests/CMakeFiles/test_streaming.dir/build
 .PHONY : test_streaming/fast
 
+# Convenience name for target.
+tests/CMakeFiles/test_versioning.dir/rule:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_versioning.dir/rule
+.PHONY : tests/CMakeFiles/test_versioning.dir/rule
+
+# Convenience name for target.
+test_versioning: tests/CMakeFiles/test_versioning.dir/rule
+.PHONY : test_versioning
+
+# fast build rule for target.
+test_versioning/fast:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_versioning.dir/build.make tests/CMakeFiles/test_versioning.dir/build
+.PHONY : test_versioning/fast
+
 test_batch.o: test_batch.cpp.o
 .PHONY : test_batch.o
 
@@ -617,6 +631,30 @@ test_streaming.cpp.s:
 	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_streaming.dir/build.make tests/CMakeFiles/test_streaming.dir/test_streaming.cpp.s
 .PHONY : test_streaming.cpp.s
 
+test_versioning.o: test_versioning.cpp.o
+.PHONY : test_versioning.o
+
+# target to build an object file
+test_versioning.cpp.o:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_versioning.dir/build.make tests/CMakeFiles/test_versioning.dir/test_versioning.cpp.o
+.PHONY : test_versioning.cpp.o
+
+test_versioning.i: test_versioning.cpp.i
+.PHONY : test_versioning.i
+
+# target to preprocess a source file
+test_versioning.cpp.i:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_versioning.dir/build.make tests/CMakeFiles/test_versioning.dir/test_versioning.cpp.i
+.PHONY : test_versioning.cpp.i
+
+test_versioning.s: test_versioning.cpp.s
+.PHONY : test_versioning.s
+
+# target to generate assembly for a file
+test_versioning.cpp.s:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_versioning.dir/build.make tests/CMakeFiles/test_versioning.dir/test_versioning.cpp.s
+.PHONY : test_versioning.cpp.s
+
 test_xml.o: test_xml.cpp.o
 .PHONY : test_xml.o
 
@@ -689,6 +727,7 @@ help:
 	@echo "... test_parser"
 	@echo "... test_path_access"
 	@echo "... test_streaming"
+	@echo "... test_versioning"
 	@echo "... test_xml"
 	@echo "... test_yaml"
 	@echo "... test_batch.o"
@@ -724,6 +763,9 @@ help:
 	@echo "... test_streaming.o"
 	@echo "... test_streaming.i"
 	@echo "... test_streaming.s"
+	@echo "... test_versioning.o"
+	@echo "... test_versioning.i"
+	@echo "... test_versioning.s"
 	@echo "... test_xml.o"
 	@echo "... test_xml.i"
 	@echo "... test_xml.s"

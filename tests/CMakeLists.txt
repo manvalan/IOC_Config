@@ -78,3 +78,9 @@ target_link_libraries(test_streaming PRIVATE ioc_config_static)
 target_include_directories(test_streaming PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 add_test(NAME StreamingTest COMMAND test_streaming)
 
+# Test 14: Versioning and history tracking (NEW)
+add_executable(test_versioning test_versioning.cpp)
+target_link_libraries(test_versioning PRIVATE ioc_config_static)
+target_include_directories(test_versioning PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+add_test(NAME VersioningTest COMMAND test_versioning)
+

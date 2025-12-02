@@ -1,10 +1,10 @@
-Start testing: Dec 02 10:36 CET
+Start testing: Dec 02 12:21 CET
 ----------------------------------------------------------
-1/8 Testing: ParserTest
-1/8 Test: ParserTest
+1/14 Testing: ParserTest
+1/14 Test: ParserTest
 Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_parser"
 Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
-"ParserTest" start time: Dec 02 10:36 CET
+"ParserTest" start time: Dec 02 12:21 CET
 Output:
 ----------------------------------------------------------
 Running OOP Parser Tests...
@@ -28,18 +28,18 @@ Test: JSON serialization... PASS
 ============================= 
 All tests PASSED! ✓ 
 <end of output>
-Test time =   0.14 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"ParserTest" end time: Dec 02 10:36 CET
+"ParserTest" end time: Dec 02 12:21 CET
 "ParserTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-2/8 Testing: BuilderTest
-2/8 Test: BuilderTest
+2/14 Testing: BuilderTest
+2/14 Test: BuilderTest
 Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_builder"
 Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
-"BuilderTest" start time: Dec 02 10:36 CET
+"BuilderTest" start time: Dec 02 12:21 CET
 Output:
 ----------------------------------------------------------
 Test: Config builder...
@@ -53,18 +53,18 @@ Built sections:
 
 Test: Config builder... PASS
 <end of output>
-Test time =   0.23 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"BuilderTest" end time: Dec 02 10:36 CET
+"BuilderTest" end time: Dec 02 12:21 CET
 "BuilderTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-3/8 Testing: ConversionTest
-3/8 Test: ConversionTest
+3/14 Testing: ConversionTest
+3/14 Test: ConversionTest
 Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_conversion"
 Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
-"ConversionTest" start time: Dec 02 10:36 CET
+"ConversionTest" start time: Dec 02 12:21 CET
 Output:
 ----------------------------------------------------------
 Testing OOP <-> JSON Conversion...
@@ -72,18 +72,18 @@ Testing OOP <-> JSON Conversion...
 Test: OOP -> JSON conversion
   Conversion failed!
 <end of output>
-Test time =   0.24 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Failed.
-"ConversionTest" end time: Dec 02 10:36 CET
+"ConversionTest" end time: Dec 02 12:21 CET
 "ConversionTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-4/8 Testing: JsonTest
-4/8 Test: JsonTest
+4/14 Testing: JsonTest
+4/14 Test: JsonTest
 Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_json"
 Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
-"JsonTest" start time: Dec 02 10:36 CET
+"JsonTest" start time: Dec 02 12:21 CET
 Output:
 ----------------------------------------------------------
 IOC_Config - JSON Functionality Tests
@@ -133,18 +133,18 @@ IOC_Config - JSON Functionality Tests
 =====================================
 All JSON tests completed! ✓
 <end of output>
-Test time =   0.24 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"JsonTest" end time: Dec 02 10:36 CET
+"JsonTest" end time: Dec 02 12:21 CET
 "JsonTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-5/8 Testing: ConstraintsTest
-5/8 Test: ConstraintsTest
+5/14 Testing: ConstraintsTest
+5/14 Test: ConstraintsTest
 Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_constraints"
 Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
-"ConstraintsTest" start time: Dec 02 10:36 CET
+"ConstraintsTest" start time: Dec 02 12:21 CET
 Output:
 ----------------------------------------------------------
 IOC_Config - Advanced Validation and Constraints Tests
@@ -211,20 +211,21 @@ Sections: 5
 ======================================================
 All tests completed! ✓
 <end of output>
-Test time =   0.24 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"ConstraintsTest" end time: Dec 02 10:36 CET
+"ConstraintsTest" end time: Dec 02 12:21 CET
 "ConstraintsTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-6/8 Testing: BuilderSchemaTest
-6/8 Test: BuilderSchemaTest
+6/14 Testing: BuilderSchemaTest
+6/14 Test: BuilderSchemaTest
 Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_builder_schema"
 Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
-"BuilderSchemaTest" start time: Dec 02 10:36 CET
+"BuilderSchemaTest" start time: Dec 02 12:21 CET
 Output:
 ----------------------------------------------------------
+Assertion failed: (mag_prop.contains("maximum")), function testSchemaWithConstraints, file test_builder_schema.cpp, line 224.
 
 IOC_Config - ConfigBuilder and Schema Export Tests
 ====================================================
@@ -282,39 +283,19 @@ Test: Schema JSON Export... PASS
 Test: Schema Save to File... PASS
 
 === Test: Schema JSON with Constraints ===
-✓ Constraints exported to JSON Schema correctly
-
-Constraint property:
-{
-  "constraint": "d < 20",
-  "description": "Maximum magnitude",
-  "exclusiveMaximum": 20.0,
-  "type": "number"
-}
-
-Test: Schema with Constraints... PASS
-
-=== Test: Builder from Existing Parser ===
-✓ Successfully copied section from parser
-✓ New parser has both sections
-Test: Builder from Parser... PASS
-
-====================================================
-All tests completed! ✓
-
 <end of output>
-Test time =   0.24 sec
+Test time =   0.02 sec
 ----------------------------------------------------------
-Test Passed.
-"BuilderSchemaTest" end time: Dec 02 10:36 CET
+Test Failed.
+"BuilderSchemaTest" end time: Dec 02 12:21 CET
 "BuilderSchemaTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-7/8 Testing: YamlTest
-7/8 Test: YamlTest
+7/14 Testing: YamlTest
+7/14 Test: YamlTest
 Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_yaml"
 Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
-"YamlTest" start time: Dec 02 10:36 CET
+"YamlTest" start time: Dec 02 12:21 CET
 Output:
 ----------------------------------------------------------
 IOC_Config - YAML Support Test Suite
@@ -341,49 +322,195 @@ Total:  1
 
 ✓ All tests passed!
 <end of output>
-Test time =   0.23 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"YamlTest" end time: Dec 02 10:36 CET
+"YamlTest" end time: Dec 02 12:21 CET
 "YamlTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-8/8 Testing: MergeDiffTest
-8/8 Test: MergeDiffTest
+8/14 Testing: MergeDiffTest
+8/14 Test: MergeDiffTest
 Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_merge_diff"
 Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
-"MergeDiffTest" start time: Dec 02 10:36 CET
+"MergeDiffTest" start time: Dec 02 12:21 CET
 Output:
 ----------------------------------------------------------
+Assertion failed: (id != nullptr && id->value == "17031" && "id should be replaced"), function testMergeReplace, file test_merge_diff.cpp, line 48.
 
 ==================================================
   Testing Merge, Diff, Clone & Query Operations
 ==================================================
 
-Test: Merge with REPLACE strategy... PASS
-Test: Merge with APPEND strategy... PASS
-Test: Diff functionality... PASS
-Test: Diff report generation... PASS
-Test: Diff as JSON... PASS
-Test: Clone functionality... PASS
-Test: copyFrom functionality... PASS
-Test: isEmpty functionality... PASS
-Test: getParametersWhere with predicate... PASS
-Test: getParametersByKeyPattern... PASS
-Test: getParametersByValuePattern... PASS
-Test: getParametersByType... PASS
+Test: Merge with REPLACE strategy... 
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Failed.
+"MergeDiffTest" end time: Dec 02 12:21 CET
+"MergeDiffTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/14 Testing: PathAccessTest
+9/14 Test: PathAccessTest
+Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_path_access"
+Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
+"PathAccessTest" start time: Dec 02 12:21 CET
+Output:
+----------------------------------------------------------
+Assertion failed: (id_val == "17030" && "Should retrieve parameter value"), function testGetValueByPath, file test_path_access.cpp, line 75.
 
 ==================================================
-Results: 12 passed, 0 failed
+  Testing RFC 6901 Path-Based Access
+==================================================
+
+Test: Path parsing... PASS
+Test: Path escaping/unescaping... PASS
+Test: getValueByPath... 
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Failed.
+"PathAccessTest" end time: Dec 02 12:21 CET
+"PathAccessTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/14 Testing: XmlTest
+10/14 Test: XmlTest
+Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_xml"
+Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
+"XmlTest" start time: Dec 02 12:21 CET
+Output:
+----------------------------------------------------------
+Assertion failed: (content->value == "Vesta Asteroid" && "Content should be preserved"), function testXmlWithContent, file test_xml.cpp, line 97.
+
+==================================================
+  Testing XML Format Support
+==================================================
+
+Test: XML support available... PASS
+Test: Load from XML string... PASS
+Test: XML with text content... 
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Failed.
+"XmlTest" end time: Dec 02 12:21 CET
+"XmlTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/14 Testing: CsvTest
+11/14 Test: CsvTest
+Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_csv"
+Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
+"CsvTest" start time: Dec 02 12:21 CET
+Output:
+----------------------------------------------------------
+Assertion failed: (mag != nullptr && "Should have magnitude parameter"), function testLoadFromCsvString, file test_csv.cpp, line 74.
+
+==================================================
+  Testing CSV Format Support
+==================================================
+
+Test: CSV delimiter detection... PASS
+Test: Load from CSV string... 
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Failed.
+"CsvTest" end time: Dec 02 12:21 CET
+"CsvTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/14 Testing: BatchTest
+12/14 Test: BatchTest
+Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_batch"
+Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
+"BatchTest" start time: Dec 02 12:21 CET
+Output:
+----------------------------------------------------------
+Assertion failed: (stats.successful_operations == 3), function testBatchValidateAllSuccess, file test_batch.cpp, line 53.
+
+==================================================
+  Testing Batch Operations Support (Phase 2B.1)
+==================================================
+
+<end of output>
+Test time =   0.02 sec
+----------------------------------------------------------
+Test Failed.
+"BatchTest" end time: Dec 02 12:21 CET
+"BatchTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/14 Testing: StreamingTest
+13/14 Test: StreamingTest
+Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_streaming"
+Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
+"StreamingTest" start time: Dec 02 12:21 CET
+Output:
+----------------------------------------------------------
+
+==================================================
+  Testing Streaming I/O Operations (Phase 2B.2)
+==================================================
+
+✓ Test: Load from string stream... PASS
+✓ Test: Save to string stream... PASS
+✓ Test: Stream round-trip... PASS
+✓ Test: Load from file stream... PASS
+✓ Test: Save to file stream... PASS
+✓ Test: Load from stream empty... PASS
+✓ Test: Load from stream with comments... PASS
+✓ Test: Load from stream data types... PASS
+✓ Test: Stream preserves content... PASS
+✓ Test: Stream special characters... PASS
+✓ Test: Multiple stream operations... PASS
+
+==================================================
+Results: 11 passed, 0 failed
 All tests PASSED! ✓
 ==================================================
 
 <end of output>
-Test time =   0.00 sec
+Test time =   0.01 sec
 ----------------------------------------------------------
 Test Passed.
-"MergeDiffTest" end time: Dec 02 10:36 CET
-"MergeDiffTest" time elapsed: 00:00:00
+"StreamingTest" end time: Dec 02 12:21 CET
+"StreamingTest" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: Dec 02 10:36 CET
+14/14 Testing: VersioningTest
+14/14 Test: VersioningTest
+Command: "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_versioning"
+Directory: /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests
+"VersioningTest" start time: Dec 02 12:21 CET
+Output:
+----------------------------------------------------------
+
+=== Phase 2B.3: Versioning Tests ===
+Test 1: Enable/Disable ... PASS
+Test 2: Create versions ... PASS
+Test 3: Get history ... PASS
+Test 4: Rollback ... PASS
+Test 5: Rollback previous ... PASS
+Test 6: Invalid rollback ... Version 99 not found in history
+PASS
+Test 7: Clear history ... PASS
+Test 8: Disabled operations ... PASS
+Test 9: Snapshots independent ... PASS
+Test 10: JSON export ... PASS
+Test 11: Version descriptions ... PASS
+Test 12: Version timestamps ... PASS
+
+=== Summary ===
+Total: 12 | Pass: 12 | Fail: 0
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"VersioningTest" end time: Dec 02 12:21 CET
+"VersioningTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Dec 02 12:21 CET

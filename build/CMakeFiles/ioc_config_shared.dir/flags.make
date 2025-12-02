@@ -6,7 +6,7 @@ CXX_DEFINES = -Dioc_config_shared_EXPORTS
 
 CXX_INCLUDES = -I/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/include -isystem /opt/homebrew/include
 
-CXX_FLAGSarm64 = -O3 -DNDEBUG -std=c++17 -arch arm64 -fPIC -Wall -Wextra -Wpedantic
+CXX_FLAGSarm64 = -g -std=c++17 -arch arm64 -fPIC -Wall -Wextra -Wpedantic
 
-CXX_FLAGS = -O3 -DNDEBUG -std=c++17 -arch arm64 -fPIC -Wall -Wextra -Wpedantic
+CXX_FLAGS = -g -std=c++17 -arch arm64 -fPIC -Wall -Wextra -Wpedantic
 

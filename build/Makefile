@@ -457,6 +457,19 @@ test_streaming/fast:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_streaming.dir/build.make tests/CMakeFiles/test_streaming.dir/build
 .PHONY : test_streaming/fast
 
+#=============================================================================
+# Target rules for targets named test_versioning
+
+# Build rule for target.
+test_versioning: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_versioning
+.PHONY : test_versioning
+
+# fast build rule for target.
+test_versioning/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_versioning.dir/build.make tests/CMakeFiles/test_versioning.dir/build
+.PHONY : test_versioning/fast
+
 src/oop_parser.o: src/oop_parser.cpp.o
 .PHONY : src/oop_parser.o
 
@@ -517,6 +530,7 @@ help:
 	@echo "... test_parser"
 	@echo "... test_path_access"
 	@echo "... test_streaming"
+	@echo "... test_versioning"
 	@echo "... test_xml"
 	@echo "... test_yaml"
 	@echo "... src/oop_parser.o"

@@ -94,7 +94,7 @@ search,16.5,magnitude)";
     
     // Without header, columns won't have meaningful names
     // but section should be created
-    assert(object->getParameterCount() > 0 && "Should have parameters");
+    assert(object->parameters.size() > 0 && "Should have parameters");
     
     return true;
 }

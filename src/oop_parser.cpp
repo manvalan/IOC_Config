@@ -3098,4 +3098,241 @@ bool OopParser::saveToPipe(int fd) const {
     #endif
 }
 
+// ===== VersionedOopParser Implementation =====
+
+VersionedOopParser::VersionedOopParser()
+    : OopParser(), currentVersion_(0), versioningEnabled_(false) {}
+
+std::string VersionedOopParser::generateTimestamp() const {
+    auto now = std::chrono::system_clock::now();
+    auto time = std::chrono::system_clock::to_time_t(now);
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+        now.time_since_epoch()) % 1000;
+    
+    std::ostringstream oss;
+    oss << std::put_time(std::gmtime(&time), "%Y-%m-%dT%H:%M:%S")
+        << '.' << std::setfill('0') << std::setw(3) << ms.count() << 'Z';
+    return oss.str();
+}
+
+bool VersionedOopParser::enableVersioning(const std::string& initialDescription) {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    
+    if (versioningEnabled_) {
+        return true;  // Already enabled
+    }
+    
+    // Create initial snapshot
+    VersionEntry initial(1, generateTimestamp(), initialDescription);
+    initial.snapshot->copyFrom(*this);  // Copy current state into unique_ptr
+    
+    versions_.clear();
+    versions_.push_back(std::move(initial));
+    currentVersion_ = 1;
+    versioningEnabled_ = true;
+    
+    return true;
+}
+
+bool VersionedOopParser::disableVersioning() {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    
+    if (!versioningEnabled_) {
+        return true;  // Already disabled
+    }
+    
+    versioningEnabled_ = false;
+    return true;
+}
+
+bool VersionedOopParser::isVersioningEnabled() const {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    return versioningEnabled_;
+}
+
+size_t VersionedOopParser::getCurrentVersion() const {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    return currentVersion_;
+}
+
+size_t VersionedOopParser::getVersionCount() const {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    return versions_.size();
+}
+
+std::vector<VersionEntry> VersionedOopParser::getHistory() const {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    return versions_;  // Returns a copy - safe outside the lock
+}
+
+const VersionEntry* VersionedOopParser::getVersion(size_t version) const {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    
+    for (const auto& entry : versions_) {
+        if (entry.version == version) {
+            return &entry;
+        }
+    }
+    
+    return nullptr;
+}
+
+bool VersionedOopParser::createVersion(const std::string& description) {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    
+    if (!versioningEnabled_) {
+        return false;
+    }
+    
+    // Create new version
+    size_t newVersion = currentVersion_ + 1;
+    VersionEntry entry(newVersion, generateTimestamp(), description);
+    entry.snapshot->copyFrom(*this);  // Copy current state into unique_ptr
+    
+    versions_.push_back(std::move(entry));
+    currentVersion_ = newVersion;
+    
+    return true;
+}
+
+// Internal helper - assumes lock is already held
+bool VersionedOopParser::rollback_unlocked(size_t version) {
+    if (!versioningEnabled_) {
+        return false;
+    }
+    
+    // Find target version
+    const VersionEntry* target = nullptr;
+    for (const auto& entry : versions_) {
+        if (entry.version == version) {
+            target = &entry;
+            break;
+        }
+    }
+    
+    if (!target) {
+        std::cerr << "Version " << version << " not found in history" << std::endl;
+        return false;
+    }
+    
+    // Restore from snapshot using copyFrom
+    this->copyFrom(*target->snapshot);
+    
+    // Update current version
+    currentVersion_ = version;
+    
+    return true;
+}
+
+bool VersionedOopParser::rollback(size_t version) {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    return rollback_unlocked(version);;
+}
+
+bool VersionedOopParser::rollbackPrevious() {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    
+    if (!versioningEnabled_ || currentVersion_ <= 1) {
+        return false;
+    }
+    
+    return rollback_unlocked(currentVersion_ - 1);
+}
+
+bool VersionedOopParser::clearHistory() {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    
+    if (!versioningEnabled_) {
+        return false;
+    }
+    
+    // Keep only current version as version 1
+    VersionEntry current(1, generateTimestamp(), "Reset point");
+    current.snapshot->copyFrom(*this);
+    
+    versions_.clear();
+    versions_.push_back(std::move(current));
+    currentVersion_ = 1;
+    
+    return true;
+}
+
+std::string VersionedOopParser::getVersionDescription(size_t version) const {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    
+    for (const auto& entry : versions_) {
+        if (entry.version == version) {
+            return entry.description;
+        }
+    }
+    
+    return "";
+}
+
+std::string VersionedOopParser::getVersionTimestamp(size_t version) const {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    
+    for (const auto& entry : versions_) {
+        if (entry.version == version) {
+            return entry.timestamp;
+        }
+    }
+    
+    return "";
+}
+
+std::vector<DiffEntry> VersionedOopParser::getVersionDiff(size_t fromVersion, size_t toVersion) const {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    
+    const VersionEntry* from = nullptr;
+    const VersionEntry* to = nullptr;
+    
+    for (const auto& entry : versions_) {
+        if (entry.version == fromVersion) from = &entry;
+        if (entry.version == toVersion) to = &entry;
+    }
+    
+    if (!from || !to) {
+        return {};  // Empty diff if versions not found
+    }
+    
+    // Use OopParser's diff method on the snapshots
+    std::vector<DiffEntry> result;
+    try {
+        // Compare using the snapshots
+        result = to->snapshot->diff(*from->snapshot);
+    } catch (const std::exception& e) {
+        std::cerr << "Error comparing versions: " << e.what() << std::endl;
+    }
+    
+    return result;
+}
+
+nlohmann::json VersionedOopParser::getHistoryAsJson() const {
+    std::lock_guard<std::mutex> lock(version_mutex_);
+    
+    nlohmann::json history = nlohmann::json::array();
+    
+    for (const auto& entry : versions_) {
+        nlohmann::json versionJson = nlohmann::json::object();
+        versionJson["version"] = entry.version;
+        versionJson["timestamp"] = entry.timestamp;
+        versionJson["description"] = entry.description;
+        
+        // Include section count
+        versionJson["sections"] = entry.snapshot->getAllSections().size();
+        
+        // Calculate total parameters
+        size_t paramCount = 0;
+        for (const auto& section : entry.snapshot->getAllSections()) {
+            paramCount += section.parameters.size();
+        }
+        versionJson["parameters"] = paramCount;
+        
+        history.push_back(versionJson);
+    }
+    
+    return history;
+}
+
 } // namespace ioc_config

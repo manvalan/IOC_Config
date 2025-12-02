@@ -1311,6 +1311,227 @@ private:
 };
 
 /**
+ * @brief Version history entry for versioned configurations
+ */
+struct VersionEntry {
+    size_t version;                             ///< Version number (auto-increment)
+    std::string timestamp;                      ///< ISO 8601 timestamp
+    std::string description;                    ///< Optional version description
+    std::shared_ptr<OopParser> snapshot;        ///< Configuration snapshot (shared ownership)
+
+    VersionEntry(size_t v, const std::string& ts, const std::string& desc = "")
+        : version(v), timestamp(ts), description(desc), snapshot(std::make_shared<OopParser>()) {}
+    
+    // Default copy/move semantics work with shared_ptr
+    VersionEntry(const VersionEntry&) = default;
+    VersionEntry& operator=(const VersionEntry&) = default;
+    VersionEntry(VersionEntry&&) = default;
+    VersionEntry& operator=(VersionEntry&&) = default;
+};
+
+/**
+ * @brief Versioned OOP Parser with history tracking and rollback
+ * 
+ * Extends OopParser with versioning capabilities for tracking configuration changes.
+ * Maintains a stack of configuration snapshots with timestamps and descriptions.
+ * Useful for audit trails, undo/redo functionality, and change tracking.
+ * 
+ * Thread-safe with internal mutex protection.
+ * 
+ * @since 1.4.0
+ */
+class VersionedOopParser : public OopParser {
+public:
+    /**
+     * @brief Constructor
+     */
+    VersionedOopParser();
+
+    /**
+     * @brief Enable versioning for this parser
+     * 
+     * When enabled, modifications trigger automatic version snapshots.
+     * The initial configuration is stored as version 1.
+     * 
+     * @param initialDescription Optional description for initial version
+     * @return True if successfully enabled
+     * 
+     * @example
+     * @code
+     * VersionedOopParser parser;
+     * parser.loadFromOop("config.oop");
+     * parser.enableVersioning("Initial config");
+     * 
+     * parser.setParameter("section", "param", "newvalue");
+     * // Version 2 automatically created
+     * @endcode
+     */
+    bool enableVersioning(const std::string& initialDescription = "Initial version");
+
+    /**
+     * @brief Disable versioning
+     * 
+     * Stops automatic version tracking. Existing version history is preserved.
+     * 
+     * @return True if successfully disabled
+     */
+    bool disableVersioning();
+
+    /**
+     * @brief Check if versioning is enabled
+     * @return True if versioning is active
+     */
+    bool isVersioningEnabled() const;
+
+    /**
+     * @brief Get current version number
+     * @return Current version (0 if not versioned, ≥1 if versioned)
+     */
+    size_t getCurrentVersion() const;
+
+    /**
+     * @brief Get total number of versions
+     * @return Version count
+     */
+    size_t getVersionCount() const;
+
+    /**
+     * @brief Get version history
+     * 
+     * Returns a copy of all version entries with timestamps and descriptions.
+     * Note: Returns by value to ensure thread safety outside the method.
+     * 
+     * @return Vector of all VersionEntry records
+     * 
+     * @example
+     * @code
+     * auto history = parser.getHistory();
+     * for (const auto& entry : history) {
+     *     std::cout << "Version " << entry.version << " at " 
+     *               << entry.timestamp << std::endl;
+     * }
+     * @endcode
+     */
+    std::vector<VersionEntry> getHistory() const;
+
+    /**
+     * @brief Get specific version
+     * @param version Version number to retrieve
+     * @return Pointer to VersionEntry or nullptr if not found
+     */
+    const VersionEntry* getVersion(size_t version) const;
+
+    /**
+     * @brief Create a new version (manual checkpoint)
+     * 
+     * Creates a snapshot of the current configuration with optional description.
+     * Only works if versioning is enabled.
+     * 
+     * @param description Optional description for this version
+     * @return True if version created, false if versioning disabled
+     */
+    bool createVersion(const std::string& description = "");
+
+    /**
+     * @brief Rollback to a specific version
+     * 
+     * Reverts the parser to a previous version snapshot.
+     * Current version becomes the new latest version.
+     * 
+     * @param version Version number to rollback to
+     * @return True if successful, false if version not found or versioning disabled
+     * 
+     * @example
+     * @code
+     * // Make changes
+     * parser.setParameter("section", "param", "newvalue");
+     * // Realize it was wrong
+     * parser.rollback(1);  // Back to version 1
+     * @endcode
+     */
+    bool rollback(size_t version);
+
+    /**
+     * @brief Rollback to previous version
+     * 
+     * Convenience method to rollback one version back.
+     * 
+     * @return True if successful
+     */
+    bool rollbackPrevious();
+
+    /**
+     * @brief Clear version history (keep current version)
+     * 
+     * Clears all version history except the current configuration,
+     * which becomes version 1.
+     * Useful after checkpoints to reduce memory usage.
+     * 
+     * @return True if successful
+     */
+    bool clearHistory();
+
+    /**
+     * @brief Get version description
+     * @param version Version number
+     * @return Description string or empty if not found
+     */
+    std::string getVersionDescription(size_t version) const;
+
+    /**
+     * @brief Get version timestamp
+     * @param version Version number
+     * @return Timestamp string or empty if not found
+     */
+    std::string getVersionTimestamp(size_t version) const;
+
+    /**
+     * @brief Get diff between two versions
+     * 
+     * Compares two versions and returns the differences.
+     * Useful for audit trails and change analysis.
+     * 
+     * @param fromVersion First version to compare
+     * @param toVersion Second version to compare
+     * @return Vector of DiffEntry records
+     */
+    std::vector<DiffEntry> getVersionDiff(size_t fromVersion, size_t toVersion) const;
+
+    /**
+     * @brief Export version history as JSON
+     * 
+     * Generates a JSON representation of all versions with timestamps and descriptions.
+     * 
+     * @return JSON object with version history
+     */
+    nlohmann::json getHistoryAsJson() const;
+
+    /**
+     * @brief Destructor
+     */
+    virtual ~VersionedOopParser() = default;
+
+private:
+    std::vector<VersionEntry> versions_;       ///< Version history stack
+    size_t currentVersion_;                    ///< Current active version
+    bool versioningEnabled_;                   ///< Versioning state flag
+    mutable std::mutex version_mutex_;         ///< Thread-safe access to versions
+
+    /**
+     * @brief Generate timestamp string (ISO 8601)
+     * @return Current timestamp
+     */
+    std::string generateTimestamp() const;
+
+    /**
+     * @brief Internal rollback without lock (assumes lock is held)
+     * @param version Version number to rollback to
+     * @return True if successful
+     */
+    bool rollback_unlocked(size_t version);
+};
+
+/**
  * @brief Convert OOP file to JSON
  * @param oopFilepath Path to OOP file
  * @param jsonFilepath Path to output JSON file

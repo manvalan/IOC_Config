@@ -140,6 +140,8 @@ tests/all: tests/CMakeFiles/test_yaml.dir/all
 tests/all: tests/CMakeFiles/test_merge_diff.dir/all
 tests/all: tests/CMakeFiles/test_path_access.dir/all
 tests/all: tests/CMakeFiles/test_xml.dir/all
+tests/all: tests/CMakeFiles/test_csv.dir/all
+tests/all: tests/CMakeFiles/test_batch.dir/all
 .PHONY : tests/all
 
 # Recursive "codegen" directory target.
@@ -153,6 +155,8 @@ tests/codegen: tests/CMakeFiles/test_yaml.dir/codegen
 tests/codegen: tests/CMakeFiles/test_merge_diff.dir/codegen
 tests/codegen: tests/CMakeFiles/test_path_access.dir/codegen
 tests/codegen: tests/CMakeFiles/test_xml.dir/codegen
+tests/codegen: tests/CMakeFiles/test_csv.dir/codegen
+tests/codegen: tests/CMakeFiles/test_batch.dir/codegen
 .PHONY : tests/codegen
 
 # Recursive "preinstall" directory target.
@@ -170,6 +174,8 @@ tests/clean: tests/CMakeFiles/test_yaml.dir/clean
 tests/clean: tests/CMakeFiles/test_merge_diff.dir/clean
 tests/clean: tests/CMakeFiles/test_path_access.dir/clean
 tests/clean: tests/CMakeFiles/test_xml.dir/clean
+tests/clean: tests/CMakeFiles/test_csv.dir/clean
+tests/clean: tests/CMakeFiles/test_batch.dir/clean
 .PHONY : tests/clean
 
 #=============================================================================
@@ -486,7 +492,7 @@ examples/CMakeFiles/example_yaml.dir/clean:
 tests/CMakeFiles/test_parser.dir/all: CMakeFiles/ioc_config_static.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_parser.dir/build.make tests/CMakeFiles/test_parser.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_parser.dir/build.make tests/CMakeFiles/test_parser.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=31,32 "Built target test_parser"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=35,36 "Built target test_parser"
 .PHONY : tests/CMakeFiles/test_parser.dir/all
 
 # Build rule for subdir invocation for target.
@@ -503,7 +509,7 @@ test_parser: tests/CMakeFiles/test_parser.dir/rule
 # codegen rule for target.
 tests/CMakeFiles/test_parser.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_parser.dir/build.make tests/CMakeFiles/test_parser.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=31,32 "Finished codegen for target test_parser"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=35,36 "Finished codegen for target test_parser"
 .PHONY : tests/CMakeFiles/test_parser.dir/codegen
 
 # clean rule for target.
@@ -518,7 +524,7 @@ tests/CMakeFiles/test_parser.dir/clean:
 tests/CMakeFiles/test_builder.dir/all: CMakeFiles/ioc_config_static.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_builder.dir/build.make tests/CMakeFiles/test_builder.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_builder.dir/build.make tests/CMakeFiles/test_builder.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=19,20 "Built target test_builder"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=21,22 "Built target test_builder"
 .PHONY : tests/CMakeFiles/test_builder.dir/all
 
 # Build rule for subdir invocation for target.
@@ -535,7 +541,7 @@ test_builder: tests/CMakeFiles/test_builder.dir/rule
 # codegen rule for target.
 tests/CMakeFiles/test_builder.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_builder.dir/build.make tests/CMakeFiles/test_builder.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=19,20 "Finished codegen for target test_builder"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=21,22 "Finished codegen for target test_builder"
 .PHONY : tests/CMakeFiles/test_builder.dir/codegen
 
 # clean rule for target.
@@ -550,7 +556,7 @@ tests/CMakeFiles/test_builder.dir/clean:
 tests/CMakeFiles/test_conversion.dir/all: CMakeFiles/ioc_config_static.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_conversion.dir/build.make tests/CMakeFiles/test_conversion.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_conversion.dir/build.make tests/CMakeFiles/test_conversion.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=25,26 "Built target test_conversion"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=27,28 "Built target test_conversion"
 .PHONY : tests/CMakeFiles/test_conversion.dir/all
 
 # Build rule for subdir invocation for target.
@@ -567,7 +573,7 @@ test_conversion: tests/CMakeFiles/test_conversion.dir/rule
 # codegen rule for target.
 tests/CMakeFiles/test_conversion.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_conversion.dir/build.make tests/CMakeFiles/test_conversion.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=25,26 "Finished codegen for target test_conversion"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=27,28 "Finished codegen for target test_conversion"
 .PHONY : tests/CMakeFiles/test_conversion.dir/codegen
 
 # clean rule for target.
@@ -582,7 +588,7 @@ tests/CMakeFiles/test_conversion.dir/clean:
 tests/CMakeFiles/test_json.dir/all: CMakeFiles/ioc_config_static.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_json.dir/build.make tests/CMakeFiles/test_json.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_json.dir/build.make tests/CMakeFiles/test_json.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=27,28 "Built target test_json"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=31,32 "Built target test_json"
 .PHONY : tests/CMakeFiles/test_json.dir/all
 
 # Build rule for subdir invocation for target.
@@ -599,7 +605,7 @@ test_json: tests/CMakeFiles/test_json.dir/rule
 # codegen rule for target.
 tests/CMakeFiles/test_json.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_json.dir/build.make tests/CMakeFiles/test_json.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=27,28 "Finished codegen for target test_json"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=31,32 "Finished codegen for target test_json"
 .PHONY : tests/CMakeFiles/test_json.dir/codegen
 
 # clean rule for target.
@@ -614,7 +620,7 @@ tests/CMakeFiles/test_json.dir/clean:
 tests/CMakeFiles/test_constraints.dir/all: CMakeFiles/ioc_config_static.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_constraints.dir/build.make tests/CMakeFiles/test_constraints.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_constraints.dir/build.make tests/CMakeFiles/test_constraints.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=23,24 "Built target test_constraints"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=25,26 "Built target test_constraints"
 .PHONY : tests/CMakeFiles/test_constraints.dir/all
 
 # Build rule for subdir invocation for target.
@@ -631,7 +637,7 @@ test_constraints: tests/CMakeFiles/test_constraints.dir/rule
 # codegen rule for target.
 tests/CMakeFiles/test_constraints.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_constraints.dir/build.make tests/CMakeFiles/test_constraints.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=23,24 "Finished codegen for target test_constraints"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=25,26 "Finished codegen for target test_constraints"
 .PHONY : tests/CMakeFiles/test_constraints.dir/codegen
 
 # clean rule for target.
@@ -646,7 +652,7 @@ tests/CMakeFiles/test_constraints.dir/clean:
 tests/CMakeFiles/test_builder_schema.dir/all: CMakeFiles/ioc_config_static.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_builder_schema.dir/build.make tests/CMakeFiles/test_builder_schema.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_builder_schema.dir/build.make tests/CMakeFiles/test_builder_schema.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=21,22 "Built target test_builder_schema"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=23,24 "Built target test_builder_schema"
 .PHONY : tests/CMakeFiles/test_builder_schema.dir/all
 
 # Build rule for subdir invocation for target.
@@ -663,7 +669,7 @@ test_builder_schema: tests/CMakeFiles/test_builder_schema.dir/rule
 # codegen rule for target.
 tests/CMakeFiles/test_builder_schema.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_builder_schema.dir/build.make tests/CMakeFiles/test_builder_schema.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=21,22 "Finished codegen for target test_builder_schema"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=23,24 "Finished codegen for target test_builder_schema"
 .PHONY : tests/CMakeFiles/test_builder_schema.dir/codegen
 
 # clean rule for target.
@@ -678,7 +684,7 @@ tests/CMakeFiles/test_builder_schema.dir/clean:
 tests/CMakeFiles/test_yaml.dir/all: CMakeFiles/ioc_config_static.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_yaml.dir/build.make tests/CMakeFiles/test_yaml.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_yaml.dir/build.make tests/CMakeFiles/test_yaml.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=37,38 "Built target test_yaml"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=41,42 "Built target test_yaml"
 .PHONY : tests/CMakeFiles/test_yaml.dir/all
 
 # Build rule for subdir invocation for target.
@@ -695,7 +701,7 @@ test_yaml: tests/CMakeFiles/test_yaml.dir/rule
 # codegen rule for target.
 tests/CMakeFiles/test_yaml.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_yaml.dir/build.make tests/CMakeFiles/test_yaml.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=37,38 "Finished codegen for target test_yaml"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=41,42 "Finished codegen for target test_yaml"
 .PHONY : tests/CMakeFiles/test_yaml.dir/codegen
 
 # clean rule for target.
@@ -710,7 +716,7 @@ tests/CMakeFiles/test_yaml.dir/clean:
 tests/CMakeFiles/test_merge_diff.dir/all: CMakeFiles/ioc_config_static.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_merge_diff.dir/build.make tests/CMakeFiles/test_merge_diff.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_merge_diff.dir/build.make tests/CMakeFiles/test_merge_diff.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=29,30 "Built target test_merge_diff"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=33,34 "Built target test_merge_diff"
 .PHONY : tests/CMakeFiles/test_merge_diff.dir/all
 
 # Build rule for subdir invocation for target.
@@ -727,7 +733,7 @@ test_merge_diff: tests/CMakeFiles/test_merge_diff.dir/rule
 # codegen rule for target.
 tests/CMakeFiles/test_merge_diff.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_merge_diff.dir/build.make tests/CMakeFiles/test_merge_diff.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=29,30 "Finished codegen for target test_merge_diff"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=33,34 "Finished codegen for target test_merge_diff"
 .PHONY : tests/CMakeFiles/test_merge_diff.dir/codegen
 
 # clean rule for target.
@@ -742,7 +748,7 @@ tests/CMakeFiles/test_merge_diff.dir/clean:
 tests/CMakeFiles/test_path_access.dir/all: CMakeFiles/ioc_config_static.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_path_access.dir/build.make tests/CMakeFiles/test_path_access.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_path_access.dir/build.make tests/CMakeFiles/test_path_access.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=33,34 "Built target test_path_access"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=37,38 "Built target test_path_access"
 .PHONY : tests/CMakeFiles/test_path_access.dir/all
 
 # Build rule for subdir invocation for target.
@@ -759,7 +765,7 @@ test_path_access: tests/CMakeFiles/test_path_access.dir/rule
 # codegen rule for target.
 tests/CMakeFiles/test_path_access.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_path_access.dir/build.make tests/CMakeFiles/test_path_access.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=33,34 "Finished codegen for target test_path_access"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=37,38 "Finished codegen for target test_path_access"
 .PHONY : tests/CMakeFiles/test_path_access.dir/codegen
 
 # clean rule for target.
@@ -774,7 +780,7 @@ tests/CMakeFiles/test_path_access.dir/clean:
 tests/CMakeFiles/test_xml.dir/all: CMakeFiles/ioc_config_static.dir/all
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_xml.dir/build.make tests/CMakeFiles/test_xml.dir/depend
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_xml.dir/build.make tests/CMakeFiles/test_xml.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=35,36 "Built target test_xml"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=39,40 "Built target test_xml"
 .PHONY : tests/CMakeFiles/test_xml.dir/all
 
 # Build rule for subdir invocation for target.
@@ -791,13 +797,77 @@ test_xml: tests/CMakeFiles/test_xml.dir/rule
 # codegen rule for target.
 tests/CMakeFiles/test_xml.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_xml.dir/build.make tests/CMakeFiles/test_xml.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=35,36 "Finished codegen for target test_xml"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=39,40 "Finished codegen for target test_xml"
 .PHONY : tests/CMakeFiles/test_xml.dir/codegen
 
 # clean rule for target.
 tests/CMakeFiles/test_xml.dir/clean:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_xml.dir/build.make tests/CMakeFiles/test_xml.dir/clean
 .PHONY : tests/CMakeFiles/test_xml.dir/clean
+
+#=============================================================================
+# Target rules for target tests/CMakeFiles/test_csv.dir
+
+# All Build rule for target.
+tests/CMakeFiles/test_csv.dir/all: CMakeFiles/ioc_config_static.dir/all
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_csv.dir/build.make tests/CMakeFiles/test_csv.dir/depend
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_csv.dir/build.make tests/CMakeFiles/test_csv.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=29,30 "Built target test_csv"
+.PHONY : tests/CMakeFiles/test_csv.dir/all
+
+# Build rule for subdir invocation for target.
+tests/CMakeFiles/test_csv.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles 4
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_csv.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles 0
+.PHONY : tests/CMakeFiles/test_csv.dir/rule
+
+# Convenience name for target.
+test_csv: tests/CMakeFiles/test_csv.dir/rule
+.PHONY : test_csv
+
+# codegen rule for target.
+tests/CMakeFiles/test_csv.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_csv.dir/build.make tests/CMakeFiles/test_csv.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=29,30 "Finished codegen for target test_csv"
+.PHONY : tests/CMakeFiles/test_csv.dir/codegen
+
+# clean rule for target.
+tests/CMakeFiles/test_csv.dir/clean:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_csv.dir/build.make tests/CMakeFiles/test_csv.dir/clean
+.PHONY : tests/CMakeFiles/test_csv.dir/clean
+
+#=============================================================================
+# Target rules for target tests/CMakeFiles/test_batch.dir
+
+# All Build rule for target.
+tests/CMakeFiles/test_batch.dir/all: CMakeFiles/ioc_config_static.dir/all
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_batch.dir/build.make tests/CMakeFiles/test_batch.dir/depend
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_batch.dir/build.make tests/CMakeFiles/test_batch.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=19,20 "Built target test_batch"
+.PHONY : tests/CMakeFiles/test_batch.dir/all
+
+# Build rule for subdir invocation for target.
+tests/CMakeFiles/test_batch.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles 4
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_batch.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles 0
+.PHONY : tests/CMakeFiles/test_batch.dir/rule
+
+# Convenience name for target.
+test_batch: tests/CMakeFiles/test_batch.dir/rule
+.PHONY : test_batch
+
+# codegen rule for target.
+tests/CMakeFiles/test_batch.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_batch.dir/build.make tests/CMakeFiles/test_batch.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/CMakeFiles --progress-num=19,20 "Finished codegen for target test_batch"
+.PHONY : tests/CMakeFiles/test_batch.dir/codegen
+
+# clean rule for target.
+tests/CMakeFiles/test_batch.dir/clean:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_batch.dir/build.make tests/CMakeFiles/test_batch.dir/clean
+.PHONY : tests/CMakeFiles/test_batch.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

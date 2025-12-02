@@ -418,6 +418,32 @@ test_xml/fast:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_xml.dir/build.make tests/CMakeFiles/test_xml.dir/build
 .PHONY : test_xml/fast
 
+#=============================================================================
+# Target rules for targets named test_csv
+
+# Build rule for target.
+test_csv: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_csv
+.PHONY : test_csv
+
+# fast build rule for target.
+test_csv/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_csv.dir/build.make tests/CMakeFiles/test_csv.dir/build
+.PHONY : test_csv/fast
+
+#=============================================================================
+# Target rules for targets named test_batch
+
+# Build rule for target.
+test_batch: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_batch
+.PHONY : test_batch
+
+# fast build rule for target.
+test_batch/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_batch.dir/build.make tests/CMakeFiles/test_batch.dir/build
+.PHONY : test_batch/fast
+
 src/oop_parser.o: src/oop_parser.cpp.o
 .PHONY : src/oop_parser.o
 
@@ -467,10 +493,12 @@ help:
 	@echo "... ioc-config"
 	@echo "... ioc_config_shared"
 	@echo "... ioc_config_static"
+	@echo "... test_batch"
 	@echo "... test_builder"
 	@echo "... test_builder_schema"
 	@echo "... test_constraints"
 	@echo "... test_conversion"
+	@echo "... test_csv"
 	@echo "... test_json"
 	@echo "... test_merge_diff"
 	@echo "... test_parser"

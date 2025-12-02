@@ -38,6 +38,8 @@
 /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/test_merge_diff.dir
 /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/test_path_access.dir
 /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/test_xml.dir
+/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/test_csv.dir
+/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/test_batch.dir
 /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/test.dir
 /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/edit_cache.dir
 /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/CMakeFiles/rebuild_cache.dir

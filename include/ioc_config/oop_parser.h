@@ -1097,6 +1097,143 @@ private:
 };
 
 /**
+ * @brief Batch operation statistics
+ */
+struct BatchStats {
+    size_t total_files;
+    size_t successful_operations;
+    size_t failed_operations;
+    std::vector<std::string> failed_files;
+    std::vector<std::string> error_messages;
+
+    BatchStats() : total_files(0), successful_operations(0), failed_operations(0) {}
+
+    std::string toString() const {
+        std::ostringstream oss;
+        oss << "Batch Operations: " << successful_operations << "/" << total_files 
+            << " successful";
+        if (failed_operations > 0) {
+            oss << " (" << failed_operations << " failed)";
+        }
+        return oss.str();
+    }
+};
+
+/**
+ * @brief Batch processor for bulk configuration operations
+ * 
+ * Provides high-level batch operations for processing multiple configuration files.
+ * Useful for bulk validation, conversion, and merging operations across file sets.
+ * 
+ * Thread-safe with internal mutex protection.
+ * 
+ * @since 1.3.0
+ */
+class BatchProcessor {
+public:
+    /**
+     * @brief Constructor
+     */
+    BatchProcessor();
+
+    /**
+     * @brief Validate multiple configuration files
+     * 
+     * Validates each file in the provided list, checking for syntax errors,
+     * schema violations, and structural inconsistencies.
+     * 
+     * @param filepaths Vector of file paths to validate
+     * @return BatchStats with validation results
+     * 
+     * @example
+     * @code
+     * BatchProcessor batch;
+     * std::vector<std::string> files = {"config1.oop", "config2.oop", "config3.oop"};
+     * BatchStats stats = batch.validateAll(files);
+     * std::cout << stats.toString() << std::endl;
+     * @endcode
+     */
+    BatchStats validateAll(const std::vector<std::string>& filepaths);
+
+    /**
+     * @brief Convert multiple files from one format to another
+     * 
+     * Batch converts configuration files from source format to target format.
+     * Supports: OOP, JSON, YAML, TOML, XML, CSV
+     * 
+     * @param sourceFiles Vector of source file paths
+     * @param sourceFormat Source format (e.g., "oop", "json", "xml", "csv")
+     * @param targetFormat Target format (e.g., "oop", "json", "xml", "csv")
+     * @param outputDirectory Directory for output files (optional, defaults to source dir)
+     * @return BatchStats with conversion results
+     * 
+     * @example
+     * @code
+     * std::vector<std::string> files = {"a.json", "b.json", "c.json"};
+     * BatchStats stats = batch.convertAll(files, "json", "oop", "./output");
+     * @endcode
+     */
+    BatchStats convertAll(const std::vector<std::string>& sourceFiles,
+                         const std::string& sourceFormat,
+                         const std::string& targetFormat,
+                         const std::string& outputDirectory = "");
+
+    /**
+     * @brief Merge multiple configurations into a single configuration
+     * 
+     * Sequentially merges all configurations with the first configuration
+     * as the base, using the specified merge strategy.
+     * 
+     * @param filepaths Vector of file paths to merge
+     * @param outputFile Path to output merged configuration
+     * @param strategy Merge strategy (default: REPLACE)
+     * @return BatchStats with merge results
+     * 
+     * @example
+     * @code
+     * std::vector<std::string> configs = {"base.oop", "override1.oop", "override2.oop"};
+     * BatchStats stats = batch.mergeAll(configs, "merged.oop", MergeStrategy::DEEP_MERGE);
+     * @endcode
+     */
+    BatchStats mergeAll(const std::vector<std::string>& filepaths,
+                       const std::string& outputFile,
+                       MergeStrategy strategy = MergeStrategy::REPLACE);
+
+    /**
+     * @brief Get last batch operation statistics
+     * @return BatchStats from last operation
+     */
+    BatchStats getLastStats() const;
+
+    /**
+     * @brief Clear internal statistics
+     */
+    void clearStats();
+
+private:
+    BatchStats lastStats_;                         ///< Statistics from last operation
+    mutable std::mutex stats_mutex_;               ///< Thread-safe access to stats
+
+    /**
+     * @brief Helper to load configuration from file by format
+     */
+    bool loadConfigByFormat(OopParser& config, const std::string& filepath,
+                           const std::string& format);
+
+    /**
+     * @brief Helper to save configuration to file by format
+     */
+    bool saveConfigByFormat(const OopParser& config, const std::string& filepath,
+                           const std::string& format);
+
+    /**
+     * @brief Helper to get output filename for conversion
+     */
+    std::string getOutputFilename(const std::string& sourcePath,
+                                 const std::string& targetExtension);
+};
+
+/**
  * @brief Convert OOP file to JSON
  * @param oopFilepath Path to OOP file
  * @param jsonFilepath Path to output JSON file

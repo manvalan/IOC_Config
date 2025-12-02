@@ -2664,4 +2664,255 @@ std::string getLibraryVersion() {
     return "1.0.0";
 }
 
+// ============ BatchProcessor Implementation ============
+
+BatchProcessor::BatchProcessor() {
+    clearStats();
+}
+
+BatchStats BatchProcessor::validateAll(const std::vector<std::string>& filepaths) {
+    std::lock_guard<std::mutex> lock(stats_mutex_);
+    
+    BatchStats stats;
+    stats.total_files = filepaths.size();
+    
+    for (const auto& filepath : filepaths) {
+        OopParser parser;
+        if (!parser.loadFromOop(filepath)) {
+            stats.failed_operations++;
+            stats.failed_files.push_back(filepath);
+            stats.error_messages.push_back("Failed to load: " + filepath);
+            continue;
+        }
+        
+        // Check for empty configuration
+        if (parser.isEmpty()) {
+            stats.failed_operations++;
+            stats.failed_files.push_back(filepath);
+            stats.error_messages.push_back("Empty configuration: " + filepath);
+            continue;
+        }
+        
+        stats.successful_operations++;
+    }
+    
+    lastStats_ = stats;
+    return stats;
+}
+
+BatchStats BatchProcessor::convertAll(const std::vector<std::string>& sourceFiles,
+                                     const std::string& sourceFormat,
+                                     const std::string& targetFormat,
+                                     const std::string& outputDirectory) {
+    std::lock_guard<std::mutex> lock(stats_mutex_);
+    
+    BatchStats stats;
+    stats.total_files = sourceFiles.size();
+    
+    for (const auto& sourcePath : sourceFiles) {
+        try {
+            OopParser parser;
+            
+            // Load from source format
+            if (!loadConfigByFormat(parser, sourcePath, sourceFormat)) {
+                stats.failed_operations++;
+                stats.failed_files.push_back(sourcePath);
+                stats.error_messages.push_back("Failed to load " + sourceFormat + ": " + sourcePath);
+                continue;
+            }
+            
+            // Determine output path
+            std::string outputPath = sourcePath;
+            if (!outputDirectory.empty()) {
+                size_t lastSlash = sourcePath.find_last_of("/\\");
+                std::string filename = (lastSlash != std::string::npos) 
+                    ? sourcePath.substr(lastSlash + 1) 
+                    : sourcePath;
+                outputPath = outputDirectory + "/" + getOutputFilename(filename, targetFormat);
+            } else {
+                outputPath = getOutputFilename(sourcePath, targetFormat);
+            }
+            
+            // Save to target format
+            if (!saveConfigByFormat(parser, outputPath, targetFormat)) {
+                stats.failed_operations++;
+                stats.failed_files.push_back(sourcePath);
+                stats.error_messages.push_back("Failed to save " + targetFormat + ": " + outputPath);
+                continue;
+            }
+            
+            stats.successful_operations++;
+        } catch (const std::exception& e) {
+            stats.failed_operations++;
+            stats.failed_files.push_back(sourcePath);
+            stats.error_messages.push_back("Exception: " + std::string(e.what()));
+        }
+    }
+    
+    lastStats_ = stats;
+    return stats;
+}
+
+BatchStats BatchProcessor::mergeAll(const std::vector<std::string>& filepaths,
+                                   const std::string& outputFile,
+                                   MergeStrategy strategy) {
+    std::lock_guard<std::mutex> lock(stats_mutex_);
+    
+    BatchStats stats;
+    stats.total_files = filepaths.size();
+    
+    if (filepaths.empty()) {
+        stats.failed_operations = 1;
+        stats.error_messages.push_back("No files provided for merge");
+        lastStats_ = stats;
+        return stats;
+    }
+    
+    try {
+        // Load base configuration
+        OopParser baseConfig;
+        if (!baseConfig.loadFromOop(filepaths[0])) {
+            stats.failed_operations++;
+            stats.failed_files.push_back(filepaths[0]);
+            stats.error_messages.push_back("Failed to load base config: " + filepaths[0]);
+            lastStats_ = stats;
+            return stats;
+        }
+        
+        stats.successful_operations++;
+        
+        // Merge remaining files
+        for (size_t i = 1; i < filepaths.size(); ++i) {
+            OopParser incomingConfig;
+            if (!incomingConfig.loadFromOop(filepaths[i])) {
+                stats.failed_operations++;
+                stats.failed_files.push_back(filepaths[i]);
+                stats.error_messages.push_back("Failed to load config: " + filepaths[i]);
+                continue;
+            }
+            
+            if (!baseConfig.merge(incomingConfig, strategy)) {
+                stats.failed_operations++;
+                stats.failed_files.push_back(filepaths[i]);
+                stats.error_messages.push_back("Merge failed for: " + filepaths[i]);
+                continue;
+            }
+            
+            stats.successful_operations++;
+        }
+        
+        // Save merged configuration
+        if (!baseConfig.saveToOop(outputFile)) {
+            stats.failed_operations++;
+            stats.failed_files.push_back(outputFile);
+            stats.error_messages.push_back("Failed to save merged config: " + outputFile);
+            lastStats_ = stats;
+            return stats;
+        }
+        
+    } catch (const std::exception& e) {
+        stats.failed_operations++;
+        stats.error_messages.push_back("Exception during merge: " + std::string(e.what()));
+    }
+    
+    lastStats_ = stats;
+    return stats;
+}
+
+BatchStats BatchProcessor::getLastStats() const {
+    std::lock_guard<std::mutex> lock(stats_mutex_);
+    return lastStats_;
+}
+
+void BatchProcessor::clearStats() {
+    std::lock_guard<std::mutex> lock(stats_mutex_);
+    lastStats_.total_files = 0;
+    lastStats_.successful_operations = 0;
+    lastStats_.failed_operations = 0;
+    lastStats_.failed_files.clear();
+    lastStats_.error_messages.clear();
+}
+
+bool BatchProcessor::loadConfigByFormat(OopParser& config, const std::string& filepath,
+                                       const std::string& format) {
+    std::string fmt = format;
+    
+    // Convert to lowercase
+    std::transform(fmt.begin(), fmt.end(), fmt.begin(), ::tolower);
+    
+    if (fmt == "oop" || fmt == "txt") {
+        return config.loadFromOop(filepath);
+    } else if (fmt == "json") {
+        return config.loadFromJson(filepath);
+    } else if (fmt == "xml") {
+        return config.loadFromXml(filepath);
+    } else if (fmt == "csv") {
+        return config.loadFromCsv(filepath, true);
+    } else if (fmt == "yaml" || fmt == "yml") {
+        return config.loadFromYaml(filepath);
+    } else if (fmt == "toml") {
+        return config.loadFromToml(filepath);
+    }
+    
+    std::cerr << "Unknown source format: " << format << std::endl;
+    return false;
+}
+
+bool BatchProcessor::saveConfigByFormat(const OopParser& config, const std::string& filepath,
+                                       const std::string& format) {
+    std::string fmt = format;
+    
+    // Convert to lowercase
+    std::transform(fmt.begin(), fmt.end(), fmt.begin(), ::tolower);
+    
+    if (fmt == "oop" || fmt == "txt") {
+        return const_cast<OopParser&>(config).saveToOop(filepath);
+    } else if (fmt == "json") {
+        return const_cast<OopParser&>(config).saveToJson(filepath);
+    } else if (fmt == "xml") {
+        return const_cast<OopParser&>(config).saveToXml(filepath);
+    } else if (fmt == "csv") {
+        return const_cast<OopParser&>(config).saveToCsv(filepath, true);
+    } else if (fmt == "yaml" || fmt == "yml") {
+        return const_cast<OopParser&>(config).saveToYaml(filepath);
+    } else if (fmt == "toml") {
+        return const_cast<OopParser&>(config).saveToToml(filepath);
+    }
+    
+    std::cerr << "Unknown target format: " << format << std::endl;
+    return false;
+}
+
+std::string BatchProcessor::getOutputFilename(const std::string& sourcePath,
+                                             const std::string& targetExtension) {
+    // Remove existing extension
+    size_t dotPos = sourcePath.find_last_of('.');
+    std::string baseName = (dotPos != std::string::npos) 
+        ? sourcePath.substr(0, dotPos) 
+        : sourcePath;
+    
+    // Map format to extension
+    std::string ext = targetExtension;
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    
+    std::string extension;
+    if (ext == "oop" || ext == "txt") {
+        extension = ".oop";
+    } else if (ext == "json") {
+        extension = ".json";
+    } else if (ext == "xml") {
+        extension = ".xml";
+    } else if (ext == "csv") {
+        extension = ".csv";
+    } else if (ext == "yaml" || ext == "yml") {
+        extension = ".yaml";
+    } else if (ext == "toml") {
+        extension = ".toml";
+    } else {
+        extension = "." + ext;
+    }
+    
+    return baseName + extension;
+}
+
 } // namespace ioc_config

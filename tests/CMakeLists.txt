@@ -66,3 +66,9 @@ target_link_libraries(test_csv PRIVATE ioc_config_static)
 target_include_directories(test_csv PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 add_test(NAME CsvTest COMMAND test_csv)
 
+# Test 12: Batch operations (NEW)
+add_executable(test_batch test_batch.cpp)
+target_link_libraries(test_batch PRIVATE ioc_config_static)
+target_include_directories(test_batch PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+add_test(NAME BatchTest COMMAND test_batch)
+

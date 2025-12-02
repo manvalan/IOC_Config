@@ -311,6 +311,58 @@ test_xml/fast:
 	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_xml.dir/build.make tests/CMakeFiles/test_xml.dir/build
 .PHONY : test_xml/fast
 
+# Convenience name for target.
+tests/CMakeFiles/test_csv.dir/rule:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_csv.dir/rule
+.PHONY : tests/CMakeFiles/test_csv.dir/rule
+
+# Convenience name for target.
+test_csv: tests/CMakeFiles/test_csv.dir/rule
+.PHONY : test_csv
+
+# fast build rule for target.
+test_csv/fast:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_csv.dir/build.make tests/CMakeFiles/test_csv.dir/build
+.PHONY : test_csv/fast
+
+# Convenience name for target.
+tests/CMakeFiles/test_batch.dir/rule:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_batch.dir/rule
+.PHONY : tests/CMakeFiles/test_batch.dir/rule
+
+# Convenience name for target.
+test_batch: tests/CMakeFiles/test_batch.dir/rule
+.PHONY : test_batch
+
+# fast build rule for target.
+test_batch/fast:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_batch.dir/build.make tests/CMakeFiles/test_batch.dir/build
+.PHONY : test_batch/fast
+
+test_batch.o: test_batch.cpp.o
+.PHONY : test_batch.o
+
+# target to build an object file
+test_batch.cpp.o:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_batch.dir/build.make tests/CMakeFiles/test_batch.dir/test_batch.cpp.o
+.PHONY : test_batch.cpp.o
+
+test_batch.i: test_batch.cpp.i
+.PHONY : test_batch.i
+
+# target to preprocess a source file
+test_batch.cpp.i:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_batch.dir/build.make tests/CMakeFiles/test_batch.dir/test_batch.cpp.i
+.PHONY : test_batch.cpp.i
+
+test_batch.s: test_batch.cpp.s
+.PHONY : test_batch.s
+
+# target to generate assembly for a file
+test_batch.cpp.s:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_batch.dir/build.make tests/CMakeFiles/test_batch.dir/test_batch.cpp.s
+.PHONY : test_batch.cpp.s
+
 test_builder.o: test_builder.cpp.o
 .PHONY : test_builder.o
 
@@ -406,6 +458,30 @@ test_conversion.s: test_conversion.cpp.s
 test_conversion.cpp.s:
 	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_conversion.dir/build.make tests/CMakeFiles/test_conversion.dir/test_conversion.cpp.s
 .PHONY : test_conversion.cpp.s
+
+test_csv.o: test_csv.cpp.o
+.PHONY : test_csv.o
+
+# target to build an object file
+test_csv.cpp.o:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_csv.dir/build.make tests/CMakeFiles/test_csv.dir/test_csv.cpp.o
+.PHONY : test_csv.cpp.o
+
+test_csv.i: test_csv.cpp.i
+.PHONY : test_csv.i
+
+# target to preprocess a source file
+test_csv.cpp.i:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_csv.dir/build.make tests/CMakeFiles/test_csv.dir/test_csv.cpp.i
+.PHONY : test_csv.cpp.i
+
+test_csv.s: test_csv.cpp.s
+.PHONY : test_csv.s
+
+# target to generate assembly for a file
+test_csv.cpp.s:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_csv.dir/build.make tests/CMakeFiles/test_csv.dir/test_csv.cpp.s
+.PHONY : test_csv.cpp.s
 
 test_json.o: test_json.cpp.o
 .PHONY : test_json.o
@@ -564,16 +640,21 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... test"
+	@echo "... test_batch"
 	@echo "... test_builder"
 	@echo "... test_builder_schema"
 	@echo "... test_constraints"
 	@echo "... test_conversion"
+	@echo "... test_csv"
 	@echo "... test_json"
 	@echo "... test_merge_diff"
 	@echo "... test_parser"
 	@echo "... test_path_access"
 	@echo "... test_xml"
 	@echo "... test_yaml"
+	@echo "... test_batch.o"
+	@echo "... test_batch.i"
+	@echo "... test_batch.s"
 	@echo "... test_builder.o"
 	@echo "... test_builder.i"
 	@echo "... test_builder.s"
@@ -586,6 +667,9 @@ help:
 	@echo "... test_conversion.o"
 	@echo "... test_conversion.i"
 	@echo "... test_conversion.s"
+	@echo "... test_csv.o"
+	@echo "... test_csv.i"
+	@echo "... test_csv.s"
 	@echo "... test_json.o"
 	@echo "... test_json.i"
 	@echo "... test_json.s"

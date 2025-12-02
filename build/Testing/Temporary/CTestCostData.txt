@@ -1,17 +1,17 @@
-ParserTest 5 0.00133118
-BuilderTest 5 0.00117199
+ParserTest 6 0.00111702
+BuilderTest 6 0.000962056
 ConversionTest 0 0
-JsonTest 5 0.00114867
-ConstraintsTest 5 0.00108461
+JsonTest 6 0.00115917
+ConstraintsTest 6 0.000936021
 BuilderSchemaTest 0 0
-YamlTest 5 0.00105724
-MergeDiffTest 1 0.00394854
-PathAccessTest 1 0.00353904
+YamlTest 6 0.0011607
+MergeDiffTest 2 0.00335923
+PathAccessTest 2 0.00313119
 XmlTest 0 0
 CsvTest 0 0
 BatchTest 0 0
-StreamingTest 5 0.00136339
-VersioningTest 5 0.00168787
+StreamingTest 6 0.00119061
+VersioningTest 6 0.00113498
 ---
 ConversionTest
 BuilderSchemaTest

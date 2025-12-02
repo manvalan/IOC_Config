@@ -1730,7 +1730,11 @@ bool OopParser::loadFromCsvString(const std::string& csvString, bool hasHeader) 
                 }
                 
                 ConfigParameter param;
-                param.key = "." + headers[j];
+                param.key = headers[j];
+                // Remove leading dot if present for consistency with parseLine
+                if (!param.key.empty() && param.key[0] == '.') {
+                    param.key = param.key.substr(1);
+                }
                 param.value = row[j];
                 
                 // Trim whitespace from value

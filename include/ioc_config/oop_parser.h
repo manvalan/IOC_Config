@@ -692,6 +692,83 @@ public:
      */
     static char detectCsvDelimiter(const std::string& csvContent);
 
+    // ============ Streaming I/O Operations ============
+
+    /**
+     * @brief Load configuration from input stream
+     * 
+     * Reads OOP format configuration from standard input stream.
+     * Useful for pipes, sockets, and other stream-based I/O.
+     * 
+     * @param input Input stream to read from
+     * @return True if successful, false otherwise
+     * 
+     * @example
+     * @code
+     * std::ifstream file("config.oop");
+     * OopParser parser;
+     * if (parser.loadFromStream(file)) {
+     *     std::cout << "Loaded from stream" << std::endl;
+     * }
+     * @endcode
+     * 
+     * @note Compatible with: std::ifstream, std::istringstream, std::cin
+     * @note Memory-efficient: reads line-by-line
+     */
+    bool loadFromStream(std::istream& input);
+
+    /**
+     * @brief Save configuration to output stream
+     * 
+     * Writes OOP format configuration to standard output stream.
+     * Useful for pipes, sockets, and other stream-based I/O.
+     * 
+     * @param output Output stream to write to
+     * @return True if successful, false otherwise
+     * 
+     * @example
+     * @code
+     * std::ofstream file("output.oop");
+     * OopParser parser;
+     * // ... populate parser ...
+     * if (parser.saveToStream(file)) {
+     *     std::cout << "Saved to stream" << std::endl;
+     * }
+     * @endcode
+     * 
+     * @note Compatible with: std::ofstream, std::ostringstream, std::cout
+     * @note Memory-efficient: writes line-by-line
+     */
+    bool saveToStream(std::ostream& output) const;
+
+    /**
+     * @brief Load configuration from pipe file descriptor
+     * 
+     * Loads configuration from a pipe or file descriptor.
+     * Advanced I/O for inter-process communication.
+     * 
+     * @param fd File descriptor to read from
+     * @return True if successful, false otherwise
+     * 
+     * @note Returns false if not supported on platform
+     * @note Non-blocking mode may be supported
+     */
+    bool loadFromPipe(int fd);
+
+    /**
+     * @brief Save configuration to pipe file descriptor
+     * 
+     * Saves configuration to a pipe or file descriptor.
+     * Advanced I/O for inter-process communication.
+     * 
+     * @param fd File descriptor to write to
+     * @return True if successful, false otherwise
+     * 
+     * @note Returns false if not supported on platform
+     * @note Non-blocking mode may be supported
+     */
+    bool saveToPipe(int fd) const;
+
     /**
      * @brief Load configuration from JSON object
      * @param jsonObj nlohmann::json object containing configuration

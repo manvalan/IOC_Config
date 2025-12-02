@@ -339,6 +339,20 @@ test_batch/fast:
 	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_batch.dir/build.make tests/CMakeFiles/test_batch.dir/build
 .PHONY : test_batch/fast
 
+# Convenience name for target.
+tests/CMakeFiles/test_streaming.dir/rule:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_streaming.dir/rule
+.PHONY : tests/CMakeFiles/test_streaming.dir/rule
+
+# Convenience name for target.
+test_streaming: tests/CMakeFiles/test_streaming.dir/rule
+.PHONY : test_streaming
+
+# fast build rule for target.
+test_streaming/fast:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_streaming.dir/build.make tests/CMakeFiles/test_streaming.dir/build
+.PHONY : test_streaming/fast
+
 test_batch.o: test_batch.cpp.o
 .PHONY : test_batch.o
 
@@ -579,6 +593,30 @@ test_path_access.cpp.s:
 	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_path_access.dir/build.make tests/CMakeFiles/test_path_access.dir/test_path_access.cpp.s
 .PHONY : test_path_access.cpp.s
 
+test_streaming.o: test_streaming.cpp.o
+.PHONY : test_streaming.o
+
+# target to build an object file
+test_streaming.cpp.o:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_streaming.dir/build.make tests/CMakeFiles/test_streaming.dir/test_streaming.cpp.o
+.PHONY : test_streaming.cpp.o
+
+test_streaming.i: test_streaming.cpp.i
+.PHONY : test_streaming.i
+
+# target to preprocess a source file
+test_streaming.cpp.i:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_streaming.dir/build.make tests/CMakeFiles/test_streaming.dir/test_streaming.cpp.i
+.PHONY : test_streaming.cpp.i
+
+test_streaming.s: test_streaming.cpp.s
+.PHONY : test_streaming.s
+
+# target to generate assembly for a file
+test_streaming.cpp.s:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_streaming.dir/build.make tests/CMakeFiles/test_streaming.dir/test_streaming.cpp.s
+.PHONY : test_streaming.cpp.s
+
 test_xml.o: test_xml.cpp.o
 .PHONY : test_xml.o
 
@@ -650,6 +688,7 @@ help:
 	@echo "... test_merge_diff"
 	@echo "... test_parser"
 	@echo "... test_path_access"
+	@echo "... test_streaming"
 	@echo "... test_xml"
 	@echo "... test_yaml"
 	@echo "... test_batch.o"
@@ -682,6 +721,9 @@ help:
 	@echo "... test_path_access.o"
 	@echo "... test_path_access.i"
 	@echo "... test_path_access.s"
+	@echo "... test_streaming.o"
+	@echo "... test_streaming.i"
+	@echo "... test_streaming.s"
 	@echo "... test_xml.o"
 	@echo "... test_xml.i"
 	@echo "... test_xml.s"

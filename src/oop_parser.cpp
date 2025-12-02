@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cmath>
+#include <cstdio>
 #include <set>
 
 // Include nlohmann/json for JSON support
@@ -2913,6 +2914,188 @@ std::string BatchProcessor::getOutputFilename(const std::string& sourcePath,
     }
     
     return baseName + extension;
+}
+
+// ============ Streaming I/O Implementation ============
+
+bool OopParser::loadFromStream(std::istream& input) {
+    if (!input.good()) {
+        std::cerr << "Input stream is not in good state" << std::endl;
+        return false;
+    }
+    
+    std::string currentSection;
+    std::string line;
+    
+    try {
+        while (std::getline(input, line)) {
+            // Trim leading/trailing whitespace
+            size_t start = line.find_first_not_of(" \t\r\n");
+            if (start == std::string::npos) {
+                continue;  // Empty line
+            }
+            line = line.substr(start);
+            
+            // Trim trailing whitespace
+            size_t end = line.find_last_not_of(" \t\r\n");
+            if (end != std::string::npos) {
+                line = line.substr(0, end + 1);
+            }
+            
+            // Skip comments
+            if (line[0] == '#' || line[0] == ';') {
+                continue;
+            }
+            
+            // Check for section header
+            if (line[0] == '[' && line[line.length() - 1] == ']') {
+                currentSection = line.substr(1, line.length() - 2);
+                
+                // Trim section name
+                size_t sec_start = currentSection.find_first_not_of(" \t");
+                size_t sec_end = currentSection.find_last_not_of(" \t");
+                if (sec_start != std::string::npos && sec_end != std::string::npos) {
+                    currentSection = currentSection.substr(sec_start, sec_end - sec_start + 1);
+                }
+                continue;
+            }
+            
+            // Parse key-value pair
+            size_t delimPos = line.find('=');
+            if (delimPos != std::string::npos && !currentSection.empty()) {
+                std::string key = line.substr(0, delimPos);
+                std::string value = line.substr(delimPos + 1);
+                
+                // Trim key
+                size_t key_start = key.find_first_not_of(" \t");
+                size_t key_end = key.find_last_not_of(" \t");
+                if (key_start != std::string::npos) {
+                    key = key.substr(key_start, key_end - key_start + 1);
+                }
+                
+                // Trim value
+                size_t val_start = value.find_first_not_of(" \t");
+                size_t val_end = value.find_last_not_of(" \t\r\n");
+                if (val_start != std::string::npos && val_end != std::string::npos) {
+                    value = value.substr(val_start, val_end - val_start + 1);
+                }
+                
+                // Add to configuration
+                setParameter(currentSection, key, value);
+            }
+        }
+        
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error loading from stream: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool OopParser::saveToStream(std::ostream& output) const {
+    if (!output.good()) {
+        std::cerr << "Output stream is not in good state" << std::endl;
+        return false;
+    }
+    
+    try {
+        auto sections = getAllSections();
+        
+        for (size_t i = 0; i < sections.size(); ++i) {
+            const auto& section = sections[i];
+            
+            // Write section header
+            output << "[" << section.name << "]\n";
+            
+            // Write parameters
+            for (const auto& [key, param] : section.parameters) {
+                output << key << " = " << param.value << "\n";
+            }
+            
+            // Add blank line between sections (except for last)
+            if (i < sections.size() - 1) {
+                output << "\n";
+            }
+        }
+        
+        output.flush();
+        return output.good();
+    } catch (const std::exception& e) {
+        std::cerr << "Error saving to stream: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool OopParser::loadFromPipe(int fd) {
+    #ifdef _WIN32
+    std::cerr << "Pipe operations not supported on Windows" << std::endl;
+    return false;
+    #else
+    // Use fdopen to convert file descriptor to stream
+    FILE* file = fdopen(fd, "r");
+    if (!file) {
+        std::cerr << "Failed to open pipe from file descriptor: " << fd << std::endl;
+        return false;
+    }
+    
+    try {
+        // Read from file descriptor line-by-line
+        char buffer[4096];
+        std::string content;
+        
+        while (fgets(buffer, sizeof(buffer), file) != nullptr) {
+            content += buffer;
+        }
+        
+        fclose(file);
+        
+        // Load from the accumulated content
+        std::istringstream iss(content);
+        return loadFromStream(iss);
+    } catch (const std::exception& e) {
+        std::cerr << "Error loading from pipe: " << e.what() << std::endl;
+        fclose(file);
+        return false;
+    }
+    #endif
+}
+
+bool OopParser::saveToPipe(int fd) const {
+    #ifdef _WIN32
+    std::cerr << "Pipe operations not supported on Windows" << std::endl;
+    return false;
+    #else
+    // Use fdopen to convert file descriptor to stream
+    FILE* file = fdopen(fd, "w");
+    if (!file) {
+        std::cerr << "Failed to open pipe to file descriptor: " << fd << std::endl;
+        return false;
+    }
+    
+    try {
+        // Save to string first
+        std::ostringstream oss;
+        if (!saveToStream(oss)) {
+            fclose(file);
+            return false;
+        }
+        
+        std::string content = oss.str();
+        
+        // Write to file descriptor
+        size_t written = fwrite(content.c_str(), 1, content.length(), file);
+        fflush(file);
+        
+        bool success = (written == content.length());
+        fclose(file);
+        
+        return success;
+    } catch (const std::exception& e) {
+        std::cerr << "Error saving to pipe: " << e.what() << std::endl;
+        fclose(file);
+        return false;
+    }
+    #endif
 }
 
 } // namespace ioc_config

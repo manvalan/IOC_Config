@@ -28,3 +28,5 @@ add_test(CsvTest "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/te
 set_tests_properties(CsvTest PROPERTIES  _BACKTRACE_TRIPLES "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/tests/CMakeLists.txt;67;add_test;/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/tests/CMakeLists.txt;0;")
 add_test(BatchTest "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_batch")
 set_tests_properties(BatchTest PROPERTIES  _BACKTRACE_TRIPLES "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/tests/CMakeLists.txt;73;add_test;/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/tests/CMakeLists.txt;0;")
+add_test(StreamingTest "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_streaming")
+set_tests_properties(StreamingTest PROPERTIES  _BACKTRACE_TRIPLES "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/tests/CMakeLists.txt;79;add_test;/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/tests/CMakeLists.txt;0;")

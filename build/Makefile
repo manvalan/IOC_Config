@@ -444,6 +444,19 @@ test_batch/fast:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_batch.dir/build.make tests/CMakeFiles/test_batch.dir/build
 .PHONY : test_batch/fast
 
+#=============================================================================
+# Target rules for targets named test_streaming
+
+# Build rule for target.
+test_streaming: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_streaming
+.PHONY : test_streaming
+
+# fast build rule for target.
+test_streaming/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_streaming.dir/build.make tests/CMakeFiles/test_streaming.dir/build
+.PHONY : test_streaming/fast
+
 src/oop_parser.o: src/oop_parser.cpp.o
 .PHONY : src/oop_parser.o
 
@@ -503,6 +516,7 @@ help:
 	@echo "... test_merge_diff"
 	@echo "... test_parser"
 	@echo "... test_path_access"
+	@echo "... test_streaming"
 	@echo "... test_xml"
 	@echo "... test_yaml"
 	@echo "... src/oop_parser.o"

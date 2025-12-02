@@ -72,3 +72,9 @@ target_link_libraries(test_batch PRIVATE ioc_config_static)
 target_include_directories(test_batch PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 add_test(NAME BatchTest COMMAND test_batch)
 
+# Test 13: Streaming I/O operations (NEW)
+add_executable(test_streaming test_streaming.cpp)
+target_link_libraries(test_streaming PRIVATE ioc_config_static)
+target_include_directories(test_streaming PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+add_test(NAME StreamingTest COMMAND test_streaming)
+

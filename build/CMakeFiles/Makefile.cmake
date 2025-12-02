@@ -83,4 +83,5 @@ set(CMAKE_DEPEND_INFO_FILES
   "tests/CMakeFiles/test_xml.dir/DependInfo.cmake"
   "tests/CMakeFiles/test_csv.dir/DependInfo.cmake"
   "tests/CMakeFiles/test_batch.dir/DependInfo.cmake"
+  "tests/CMakeFiles/test_streaming.dir/DependInfo.cmake"
   )

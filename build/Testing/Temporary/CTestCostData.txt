@@ -1,17 +1,15 @@
-ParserTest 11 0.000691504
-BuilderTest 11 0.0005885
-ConversionTest 0 0
-JsonTest 11 0.000552795
-ConstraintsTest 11 0.000541511
-BuilderSchemaTest 0 0
-YamlTest 11 0.000605693
-MergeDiffTest 7 0.000957363
-PathAccessTest 7 0.00102505
-XmlTest 4 0.00195099
-CsvTest 2 0.00447317
-BatchTest 1 0.00904321
-StreamingTest 11 0.000582477
-VersioningTest 11 0.000658223
+ParserTest 12 0.000601503
+BuilderTest 12 0.000515045
+ConversionTest 1 0.00908329
+JsonTest 12 0.000680392
+ConstraintsTest 12 0.00051499
+BuilderSchemaTest 1 0.00469204
+YamlTest 12 0.000446229
+MergeDiffTest 8 0.000779448
+PathAccessTest 8 0.000724948
+XmlTest 5 0.00139431
+CsvTest 3 0.00304179
+BatchTest 2 0.00528196
+StreamingTest 12 0.000610306
+VersioningTest 12 0.00075949
 ---
-ConversionTest
-BuilderSchemaTest

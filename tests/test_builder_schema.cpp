@@ -207,7 +207,7 @@ void testSchemaWithConstraints() {
         mag_param.key = "max_magnitude";
         mag_param.required = false;
         mag_param.description = "Maximum magnitude";
-        mag_param.constraint.parseExpression("d < 20");
+        mag_param.constraint.parseExpression("d <= 20");
         search_section.addParameter(mag_param);
         
         schema.addSection(search_section);

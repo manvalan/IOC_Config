@@ -8,16 +8,16 @@ using namespace ioc_config;
 void createTestOopFile() {
     std::ofstream file("test_input.oop");
     file << "! Test configuration\n";
-    file << "object.\n";
-    file << "        .id = '17030'\n";
-    file << "        .name = 'TestAsteroid'\n";
+    file << "[object].\n";
+    file << "id = 17030\n";
+    file << "name = TestAsteroid\n";
     file << "\n";
-    file << "time.\n";
-    file << "        .start_date = '2025-11-25'\n";
-    file << "        .end_date = '2025-12-02'\n";
+    file << "[time].\n";
+    file << "start_date = 2025-11-25\n";
+    file << "end_date = 2025-12-02\n";
     file << "\n";
-    file << "search.\n";
-    file << "        .max_magnitude = 16.0\n";
+    file << "[search].\n";
+    file << "max_magnitude = 16.0\n";
     file.close();
 }
 

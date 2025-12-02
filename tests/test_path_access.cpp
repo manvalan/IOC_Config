@@ -66,9 +66,9 @@ bool testPathEscaping() {
 bool testGetValueByPath() {
     OopParser parser;
     
-    parser.setParameter("object", ".id", "17030");
-    parser.setParameter("object", ".name", "Asteroid");
-    parser.setParameter("search", ".mag", "16.5");
+    parser.setParameter("object", "id", "17030");
+    parser.setParameter("object", "name", "Asteroid");
+    parser.setParameter("search", "mag", "16.5");
     
     // Get parameter value
     auto id_val = parser.getValueByPath("/object/id");
@@ -122,7 +122,7 @@ bool testSetValueByPath() {
 bool testHasPath() {
     OopParser parser;
     
-    parser.setParameter("object", ".id", "17030");
+    parser.setParameter("object", "id", "17030");
     
     assert(parser.hasPath("/object/id") && "Should find existing path");
     assert(!parser.hasPath("/object/missing") && "Should not find missing path");
@@ -137,9 +137,9 @@ bool testHasPath() {
 bool testDeleteByPath() {
     OopParser parser;
     
-    parser.setParameter("object", ".id", "17030");
-    parser.setParameter("object", ".name", "Asteroid");
-    parser.setParameter("search", ".mag", "16.5");
+    parser.setParameter("object", "id", "17030");
+    parser.setParameter("object", "name", "Asteroid");
+    parser.setParameter("search", "mag", "16.5");
     
     // Delete parameter
     assert(parser.hasPath("/object/id") && "Parameter should exist");
@@ -164,9 +164,9 @@ bool testDeleteByPath() {
 bool testGetAllPaths() {
     OopParser parser;
     
-    parser.setParameter("object", ".id", "17030");
-    parser.setParameter("object", ".name", "Asteroid");
-    parser.setParameter("search", ".mag", "16.5");
+    parser.setParameter("object", "id", "17030");
+    parser.setParameter("object", "name", "Asteroid");
+    parser.setParameter("search", "mag", "16.5");
     
     auto paths = parser.getAllPaths();
     
@@ -218,8 +218,8 @@ bool testSpecialCharactersInPath() {
 bool testRootPath() {
     OopParser parser;
     
-    parser.setParameter("object", ".id", "17030");
-    parser.setParameter("search", ".mag", "16.5");
+    parser.setParameter("object", "id", "17030");
+    parser.setParameter("search", "mag", "16.5");
     
     // Get root returns JSON
     auto root_json = parser.getValueByPath("/");
@@ -242,8 +242,8 @@ bool testRootPath() {
 bool testSectionPath() {
     OopParser parser;
     
-    parser.setParameter("object", ".id", "17030");
-    parser.setParameter("object", ".name", "Asteroid");
+    parser.setParameter("object", "id", "17030");
+    parser.setParameter("object", "name", "Asteroid");
     
     // Get section returns JSON
     auto section_json = parser.getValueByPath("/object");

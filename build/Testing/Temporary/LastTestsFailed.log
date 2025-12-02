@@ -1,7 +1,5 @@
 3:ConversionTest
 6:BuilderSchemaTest
-8:MergeDiffTest
-9:PathAccessTest
 10:XmlTest
 11:CsvTest
 12:BatchTest

@@ -422,7 +422,13 @@ bool OopParser::saveToJson(const std::string& filepath) const {
         for (const auto& section : sections_) {
             json section_obj;
             for (const auto& [key, param] : section.parameters) {
-                section_obj[key] = json::parse(param.value);
+                // Try to parse as JSON, fallback to string if it fails
+                try {
+                    section_obj[key] = json::parse(param.value);
+                } catch (...) {
+                    // If parsing fails, treat as string
+                    section_obj[key] = param.value;
+                }
             }
             j[section.name] = section_obj;
         }

@@ -1366,27 +1366,18 @@ bool OopParser::loadFromXmlString(const std::string& xmlString) {
         clear();
         
         // Simple XML parsing without libxml2 dependency
-        // This is a robust implementation that uses regex for element parsing
+        // Use manual parsing to handle tag extraction correctly
         
-        // Helper lambda to extract tag name from opening tag
-        auto extract_tag_name = [](const std::string& tag) -> std::string {
-            size_t name_end = tag.find_first_of(" />");
-            if (name_end != std::string::npos) {
-                return tag.substr(0, name_end);
-            }
-            return tag;
-        };
-        
-        // Helper lambda to extract attributes from tag
-        auto extract_attributes = [](const std::string& tag) -> std::map<std::string, std::string> {
+        // Helper lambda to extract attributes from tag content
+        auto extract_attributes = [](const std::string& tag_str) -> std::map<std::string, std::string> {
             std::map<std::string, std::string> attrs;
             
-            // Simple regex pattern for attributes: name="value" or name='value'
+            // Pattern for attributes: name="value" or name='value'
             std::regex attr_pattern(R"((\w+)\s*=\s*["\']([^"\']*)["\'])");
             std::smatch match;
-            std::string::const_iterator search_start(tag.cbegin());
+            std::string::const_iterator search_start(tag_str.cbegin());
             
-            while (std::regex_search(search_start, tag.cend(), match, attr_pattern)) {
+            while (std::regex_search(search_start, tag_str.cend(), match, attr_pattern)) {
                 attrs[match[1].str()] = match[2].str();
                 search_start = match.suffix().first;
             }
@@ -1404,27 +1395,40 @@ bool OopParser::loadFromXmlString(const std::string& xmlString) {
             }
         }
         
-        // Find all opening tags
-        std::regex tag_pattern(R"(<([^/>]+?)(?:\s+([^>]*))?(?:/>|>))");
-        std::smatch match;
-        std::string remaining = xmlString.substr(pos);
-        std::string::const_iterator search_start(remaining.cbegin());
-        
-        while (std::regex_search(search_start, remaining.cend(), match, tag_pattern)) {
-            std::string full_tag = match[0].str();
-            std::string tag_content = match[1].str();
+        // Manual parsing: find all tags
+        while (pos < xmlString.length()) {
+            // Find opening <
+            size_t tag_start = xmlString.find('<', pos);
+            if (tag_start == std::string::npos) break;
+            
+            // Find closing >
+            size_t tag_end = xmlString.find('>', tag_start);
+            if (tag_end == std::string::npos) break;
+            
+            // Extract tag content (between < and >)
+            std::string tag_content = xmlString.substr(tag_start + 1, tag_end - tag_start - 1);
             
             // Skip closing tags, XML declaration, and comments
-            if (tag_content[0] == '/' || tag_content[0] == '?' || tag_content[0] == '!') {
-                search_start = match.suffix().first;
+            if (tag_content.empty() || tag_content[0] == '/' || tag_content[0] == '?' || tag_content[0] == '!') {
+                pos = tag_end + 1;
                 continue;
             }
             
-            // Extract tag name
-            std::string tag_name = extract_tag_name(tag_content);
+            // Check if self-closing
+            bool is_self_closing = (tag_content.back() == '/');
             
-            if (tag_name.empty() || tag_name == "config") {
-                search_start = match.suffix().first;
+            // Extract tag name (first word)
+            std::string tag_name;
+            size_t space_pos = tag_content.find_first_of(" \t\r\n/>");
+            if (space_pos != std::string::npos) {
+                tag_name = tag_content.substr(0, space_pos);
+            } else {
+                tag_name = tag_content;
+            }
+            
+            // Skip root config tag
+            if (tag_name == "config") {
+                pos = tag_end + 1;
                 continue;
             }
             
@@ -1434,7 +1438,15 @@ bool OopParser::loadFromXmlString(const std::string& xmlString) {
             section.type = ConfigSectionData::stringToSectionType(tag_name);
             
             // Extract attributes
-            std::string attr_string = match[2].str();
+            std::string attr_string;
+            if (space_pos != std::string::npos) {
+                // Remove trailing / if present
+                attr_string = tag_content.substr(space_pos);
+                if (!attr_string.empty() && attr_string.back() == '/') {
+                    attr_string.pop_back();
+                }
+            }
+            
             if (!attr_string.empty()) {
                 auto attrs = extract_attributes(attr_string);
                 for (const auto& [key, value] : attrs) {
@@ -1446,38 +1458,41 @@ bool OopParser::loadFromXmlString(const std::string& xmlString) {
                 }
             }
             
-            // Extract text content if present (between > and </)
-            size_t match_end = match.position() + match.length();
-            if (full_tag.back() != '/' && full_tag.find("/>") == std::string::npos) {
-                size_t content_start = match_end;
-                size_t closing_tag_pos = remaining.find("</" + tag_name + ">", content_start);
+            // Extract text content for non-self-closing tags
+            if (!is_self_closing) {
+                size_t content_start = tag_end + 1;
+                std::string closing_tag = "</" + tag_name + ">";
+                size_t closing_pos = xmlString.find(closing_tag, content_start);
                 
-                if (closing_tag_pos != std::string::npos && closing_tag_pos > content_start) {
-                    std::string content = remaining.substr(content_start, closing_tag_pos - content_start);
+                if (closing_pos != std::string::npos && closing_pos > content_start) {
+                    std::string raw_content = xmlString.substr(content_start, closing_pos - content_start);
                     
-                    // Trim whitespace
-                    size_t first = content.find_first_not_of(" \t\n\r");
-                    size_t last = content.find_last_not_of(" \t\n\r");
-                    
+                    // Trim whitespace only, preserve content
+                    size_t first = raw_content.find_first_not_of(" \t\n\r");
                     if (first != std::string::npos) {
-                        content = content.substr(first, last - first + 1);
+                        size_t last = raw_content.find_last_not_of(" \t\n\r");
+                        std::string content = raw_content.substr(first, last - first + 1);
                         
                         if (!content.empty()) {
                             ConfigParameter param;
-                            param.key = "._content";
+                            param.key = "_content";
                             param.value = content;
                             param.type = "string";
                             section.parameters[param.key] = param;
                         }
                     }
+                    
+                    pos = closing_pos + closing_tag.length();
+                } else {
+                    pos = tag_end + 1;
                 }
+            } else {
+                pos = tag_end + 1;
             }
             
             if (!section.parameters.empty()) {
                 sections_.push_back(section);
             }
-            
-            search_start = match.suffix().first;
         }
         
         return true;
@@ -1647,7 +1662,7 @@ bool OopParser::loadFromCsvString(const std::string& csvString, bool hasHeader) 
         // Detect delimiter
         char delimiter = detectCsvDelimiter(csvString);
         
-        // Split into lines
+        // Split into lines and parse with proper CSV quoting rules
         std::vector<std::vector<std::string>> rows;
         std::istringstream stream(csvString);
         std::string line;
@@ -1663,10 +1678,13 @@ bool OopParser::loadFromCsvString(const std::string& csvString, bool hasHeader) 
                 char c = line[i];
                 
                 if (c == '"') {
-                    in_quotes = !in_quotes;
-                    // Include quotes in field if not at boundaries
-                    if (i > 0 && i < line.length() - 1) {
-                        field += c;
+                    // Check if this is an escaped quote (double quote)
+                    if (in_quotes && i + 1 < line.length() && line[i + 1] == '"') {
+                        field += '"';  // Add single quote to field
+                        i++;           // Skip next quote
+                    } else {
+                        // Toggle quote mode (don't add quote to field)
+                        in_quotes = !in_quotes;
                     }
                 } else if (c == delimiter && !in_quotes) {
                     row.push_back(field);
@@ -1691,7 +1709,7 @@ bool OopParser::loadFromCsvString(const std::string& csvString, bool hasHeader) 
             headers = rows[0];
             data_start = 1;
             
-            // Clean headers
+            // Clean headers: trim whitespace only, not quotes
             for (auto& h : headers) {
                 // Trim whitespace
                 size_t start = h.find_first_not_of(" \t");
@@ -1725,12 +1743,26 @@ bool OopParser::loadFromCsvString(const std::string& csvString, bool hasHeader) 
             
             // Add parameters for remaining columns
             for (size_t j = 1; j < row.size(); j++) {
-                if (j >= headers.size() || headers[j].empty()) {
+                // Skip if no header defined and we're beyond header size
+                if (headers.empty() && j >= row.size()) {
+                    continue;
+                }
+                if (!headers.empty() && j >= headers.size()) {
                     continue;
                 }
                 
+                // Get or generate parameter name
+                std::string param_name;
+                if (!headers.empty()) {
+                    param_name = headers[j];
+                    if (param_name.empty()) continue;
+                } else {
+                    // Generate auto parameter name for CSV without header
+                    param_name = "col" + std::to_string(j);
+                }
+                
                 ConfigParameter param;
-                param.key = headers[j];
+                param.key = param_name;
                 // Remove leading dot if present for consistency with parseLine
                 if (!param.key.empty() && param.key[0] == '.') {
                     param.key = param.key.substr(1);

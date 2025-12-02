@@ -1,5 +1,3 @@
 3:ConversionTest
 6:BuilderSchemaTest
-10:XmlTest
-11:CsvTest
 12:BatchTest

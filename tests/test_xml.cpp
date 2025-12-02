@@ -91,10 +91,10 @@ bool testXmlWithContent() {
     auto object = parser.getSection("object");
     assert(object != nullptr && "Should have object section");
     
-    // Text content should be in ._content
-    auto content = object->getParameter("._content");
+    // Text content should be in _content (without leading dot)
+    auto content = object->getParameter("_content");
     assert(content != nullptr && "Should have content parameter");
-    assert(content->value == "Vesta Asteroid" && "Content should be preserved");
+    assert(content->value == "Vesta Asteroid" && "Content should be exactly the text");
     
     return true;
 }

@@ -297,6 +297,20 @@ test_path_access/fast:
 	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_path_access.dir/build.make tests/CMakeFiles/test_path_access.dir/build
 .PHONY : test_path_access/fast
 
+# Convenience name for target.
+tests/CMakeFiles/test_xml.dir/rule:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 tests/CMakeFiles/test_xml.dir/rule
+.PHONY : tests/CMakeFiles/test_xml.dir/rule
+
+# Convenience name for target.
+test_xml: tests/CMakeFiles/test_xml.dir/rule
+.PHONY : test_xml
+
+# fast build rule for target.
+test_xml/fast:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_xml.dir/build.make tests/CMakeFiles/test_xml.dir/build
+.PHONY : test_xml/fast
+
 test_builder.o: test_builder.cpp.o
 .PHONY : test_builder.o
 
@@ -489,6 +503,30 @@ test_path_access.cpp.s:
 	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_path_access.dir/build.make tests/CMakeFiles/test_path_access.dir/test_path_access.cpp.s
 .PHONY : test_path_access.cpp.s
 
+test_xml.o: test_xml.cpp.o
+.PHONY : test_xml.o
+
+# target to build an object file
+test_xml.cpp.o:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_xml.dir/build.make tests/CMakeFiles/test_xml.dir/test_xml.cpp.o
+.PHONY : test_xml.cpp.o
+
+test_xml.i: test_xml.cpp.i
+.PHONY : test_xml.i
+
+# target to preprocess a source file
+test_xml.cpp.i:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_xml.dir/build.make tests/CMakeFiles/test_xml.dir/test_xml.cpp.i
+.PHONY : test_xml.cpp.i
+
+test_xml.s: test_xml.cpp.s
+.PHONY : test_xml.s
+
+# target to generate assembly for a file
+test_xml.cpp.s:
+	cd /Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build && $(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_xml.dir/build.make tests/CMakeFiles/test_xml.dir/test_xml.cpp.s
+.PHONY : test_xml.cpp.s
+
 test_yaml.o: test_yaml.cpp.o
 .PHONY : test_yaml.o
 
@@ -534,6 +572,7 @@ help:
 	@echo "... test_merge_diff"
 	@echo "... test_parser"
 	@echo "... test_path_access"
+	@echo "... test_xml"
 	@echo "... test_yaml"
 	@echo "... test_builder.o"
 	@echo "... test_builder.i"
@@ -559,6 +598,9 @@ help:
 	@echo "... test_path_access.o"
 	@echo "... test_path_access.i"
 	@echo "... test_path_access.s"
+	@echo "... test_xml.o"
+	@echo "... test_xml.i"
+	@echo "... test_xml.s"
 	@echo "... test_yaml.o"
 	@echo "... test_yaml.i"
 	@echo "... test_yaml.s"

@@ -80,4 +80,5 @@ set(CMAKE_DEPEND_INFO_FILES
   "tests/CMakeFiles/test_yaml.dir/DependInfo.cmake"
   "tests/CMakeFiles/test_merge_diff.dir/DependInfo.cmake"
   "tests/CMakeFiles/test_path_access.dir/DependInfo.cmake"
+  "tests/CMakeFiles/test_xml.dir/DependInfo.cmake"
   )

@@ -405,6 +405,19 @@ test_path_access/fast:
 	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_path_access.dir/build.make tests/CMakeFiles/test_path_access.dir/build
 .PHONY : test_path_access/fast
 
+#=============================================================================
+# Target rules for targets named test_xml
+
+# Build rule for target.
+test_xml: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test_xml
+.PHONY : test_xml
+
+# fast build rule for target.
+test_xml/fast:
+	$(MAKE) $(MAKESILENT) -f tests/CMakeFiles/test_xml.dir/build.make tests/CMakeFiles/test_xml.dir/build
+.PHONY : test_xml/fast
+
 src/oop_parser.o: src/oop_parser.cpp.o
 .PHONY : src/oop_parser.o
 
@@ -462,6 +475,7 @@ help:
 	@echo "... test_merge_diff"
 	@echo "... test_parser"
 	@echo "... test_path_access"
+	@echo "... test_xml"
 	@echo "... test_yaml"
 	@echo "... src/oop_parser.o"
 	@echo "... src/oop_parser.i"

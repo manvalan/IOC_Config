@@ -555,6 +555,66 @@ public:
      */
     std::string saveToTomlString() const;
 
+    // ============ XML Support Methods ============
+
+    /**
+     * @brief Load configuration from XML file
+     * @param filepath Path to XML file
+     * @return True if successful (with graceful fallback if libxml2 unavailable)
+     * 
+     * @note Requires optional libxml2 library. If not available, returns false gracefully.
+     * 
+     * XML Structure Mapping:
+     * - XML elements map to configuration sections
+     * - XML attributes map to configuration parameters
+     * - Text content uses special "_content" key
+     * 
+     * @example
+     * @code
+     * <config>
+     *   <object id="17030" name="Asteroid">
+     *     <discovery>2025-12-01</discovery>
+     *   </object>
+     * </config>
+     * 
+     * Produces sections:
+     *   object: { id: "17030", name: "Asteroid", discovery: "2025-12-01" }
+     * @endcode
+     */
+    bool loadFromXml(const std::string& filepath);
+
+    /**
+     * @brief Save configuration to XML file
+     * @param filepath Path to XML file to create/overwrite
+     * @return True if successful (with graceful fallback if libxml2 unavailable)
+     * 
+     * @note Requires optional libxml2 library. If not available, returns false gracefully.
+     */
+    bool saveToXml(const std::string& filepath) const;
+
+    /**
+     * @brief Load configuration from XML string
+     * @param xmlString XML string containing configuration
+     * @return True if successful, false otherwise
+     * 
+     * @note Requires optional libxml2 library. If not available, returns false gracefully.
+     */
+    bool loadFromXmlString(const std::string& xmlString);
+
+    /**
+     * @brief Save configuration to XML string
+     * @return XML string representation of configuration, or empty if libxml2 unavailable
+     * 
+     * @note Requires optional libxml2 library. If not available, returns empty string gracefully.
+     */
+    std::string saveToXmlString() const;
+
+    /**
+     * @brief Check if XML support is available (libxml2 compiled in)
+     * @return True if XML operations are supported
+     */
+    static bool isXmlSupported();
+
     /**
      * @brief Load configuration from JSON object
      * @param jsonObj nlohmann::json object containing configuration

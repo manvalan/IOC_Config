@@ -54,3 +54,9 @@ target_link_libraries(test_path_access PRIVATE ioc_config_static)
 target_include_directories(test_path_access PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 add_test(NAME PathAccessTest COMMAND test_path_access)
 
+# Test 10: XML format support (NEW)
+add_executable(test_xml test_xml.cpp)
+target_link_libraries(test_xml PRIVATE ioc_config_static)
+target_include_directories(test_xml PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+add_test(NAME XmlTest COMMAND test_xml)
+

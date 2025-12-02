@@ -22,3 +22,5 @@ add_test(MergeDiffTest "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/bu
 set_tests_properties(MergeDiffTest PROPERTIES  _BACKTRACE_TRIPLES "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/tests/CMakeLists.txt;49;add_test;/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/tests/CMakeLists.txt;0;")
 add_test(PathAccessTest "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_path_access")
 set_tests_properties(PathAccessTest PROPERTIES  _BACKTRACE_TRIPLES "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/tests/CMakeLists.txt;55;add_test;/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/tests/CMakeLists.txt;0;")
+add_test(XmlTest "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/build/tests/test_xml")
+set_tests_properties(XmlTest PROPERTIES  _BACKTRACE_TRIPLES "/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/tests/CMakeLists.txt;61;add_test;/Users/michelebigi/VisualStudioCode/GitHub/IOC_Config/tests/CMakeLists.txt;0;")

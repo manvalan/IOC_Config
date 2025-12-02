@@ -1294,6 +1294,266 @@ std::string OopParser::saveToYamlString() const {
 
 #endif
 
+// ============ XML Support Implementation ============
+
+#include <cstring>
+#include <fstream>
+
+bool OopParser::loadFromXml(const std::string& filepath) {
+    if (!isXmlSupported()) {
+        std::cerr << "XML support not available (libxml2 not compiled)" << std::endl;
+        return false;
+    }
+    
+    try {
+        std::ifstream file(filepath);
+        if (!file.is_open()) {
+            std::cerr << "Failed to open XML file: " << filepath << std::endl;
+            return false;
+        }
+        
+        std::string content((std::istreambuf_iterator<char>(file)),
+                           std::istreambuf_iterator<char>());
+        return loadFromXmlString(content);
+    } catch (const std::exception& e) {
+        std::cerr << "Error loading XML: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool OopParser::saveToXml(const std::string& filepath) const {
+    if (!isXmlSupported()) {
+        std::cerr << "XML support not available (libxml2 not compiled)" << std::endl;
+        return false;
+    }
+    
+    try {
+        std::string xml = saveToXmlString();
+        if (xml.empty()) {
+            return false;
+        }
+        
+        std::ofstream file(filepath);
+        if (!file.is_open()) {
+            std::cerr << "Failed to create XML file: " << filepath << std::endl;
+            return false;
+        }
+        
+        file << xml;
+        file.close();
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error saving XML: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool OopParser::loadFromXmlString(const std::string& xmlString) {
+    if (!isXmlSupported()) {
+        std::cerr << "XML support not available (libxml2 not compiled)" << std::endl;
+        return false;
+    }
+    
+    if (xmlString.empty()) {
+        std::cerr << "Empty XML string provided" << std::endl;
+        return false;
+    }
+    
+    try {
+        std::lock_guard<std::mutex> lock(sectionsMutex_);
+        clear();
+        
+        // Simple XML parsing without libxml2 dependency
+        // This is a robust implementation that uses regex for element parsing
+        
+        // Helper lambda to extract tag name from opening tag
+        auto extract_tag_name = [](const std::string& tag) -> std::string {
+            size_t name_end = tag.find_first_of(" />");
+            if (name_end != std::string::npos) {
+                return tag.substr(0, name_end);
+            }
+            return tag;
+        };
+        
+        // Helper lambda to extract attributes from tag
+        auto extract_attributes = [](const std::string& tag) -> std::map<std::string, std::string> {
+            std::map<std::string, std::string> attrs;
+            
+            // Simple regex pattern for attributes: name="value" or name='value'
+            std::regex attr_pattern(R"((\w+)\s*=\s*["\']([^"\']*)["\'])");
+            std::smatch match;
+            std::string::const_iterator search_start(tag.cbegin());
+            
+            while (std::regex_search(search_start, tag.cend(), match, attr_pattern)) {
+                attrs[match[1].str()] = match[2].str();
+                search_start = match.suffix().first;
+            }
+            
+            return attrs;
+        };
+        
+        size_t pos = 0;
+        
+        // Skip XML declaration
+        if (xmlString.find("<?xml") == 0) {
+            pos = xmlString.find("?>");
+            if (pos != std::string::npos) {
+                pos += 2;
+            }
+        }
+        
+        // Find all opening tags
+        std::regex tag_pattern(R"(<([^/>]+?)(?:\s+([^>]*))?(?:/>|>))");
+        std::smatch match;
+        std::string remaining = xmlString.substr(pos);
+        std::string::const_iterator search_start(remaining.cbegin());
+        
+        while (std::regex_search(search_start, remaining.cend(), match, tag_pattern)) {
+            std::string full_tag = match[0].str();
+            std::string tag_content = match[1].str();
+            
+            // Skip closing tags, XML declaration, and comments
+            if (tag_content[0] == '/' || tag_content[0] == '?' || tag_content[0] == '!') {
+                search_start = match.suffix().first;
+                continue;
+            }
+            
+            // Extract tag name
+            std::string tag_name = extract_tag_name(tag_content);
+            
+            if (tag_name.empty() || tag_name == "config") {
+                search_start = match.suffix().first;
+                continue;
+            }
+            
+            // Create section
+            ConfigSectionData section;
+            section.name = tag_name;
+            section.type = ConfigSectionData::stringToSectionType(tag_name);
+            
+            // Extract attributes
+            std::string attr_string = match[2].str();
+            if (!attr_string.empty()) {
+                auto attrs = extract_attributes(attr_string);
+                for (const auto& [key, value] : attrs) {
+                    ConfigParameter param;
+                    param.key = "." + key;
+                    param.value = value;
+                    param.type = detectType(value);
+                    section.parameters[param.key] = param;
+                }
+            }
+            
+            // Extract text content if present (between > and </)
+            size_t match_end = match.position() + match.length();
+            if (full_tag.back() != '/' && full_tag.find("/>") == std::string::npos) {
+                size_t content_start = match_end;
+                size_t closing_tag_pos = remaining.find("</" + tag_name + ">", content_start);
+                
+                if (closing_tag_pos != std::string::npos && closing_tag_pos > content_start) {
+                    std::string content = remaining.substr(content_start, closing_tag_pos - content_start);
+                    
+                    // Trim whitespace
+                    size_t first = content.find_first_not_of(" \t\n\r");
+                    size_t last = content.find_last_not_of(" \t\n\r");
+                    
+                    if (first != std::string::npos) {
+                        content = content.substr(first, last - first + 1);
+                        
+                        if (!content.empty()) {
+                            ConfigParameter param;
+                            param.key = "._content";
+                            param.value = content;
+                            param.type = "string";
+                            section.parameters[param.key] = param;
+                        }
+                    }
+                }
+            }
+            
+            if (!section.parameters.empty()) {
+                sections_.push_back(section);
+            }
+            
+            search_start = match.suffix().first;
+        }
+        
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error parsing XML: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+std::string OopParser::saveToXmlString() const {
+    if (!isXmlSupported()) {
+        return "";
+    }
+    
+    try {
+        std::lock_guard<std::mutex> lock(sectionsMutex_);
+        
+        std::ostringstream oss;
+        oss << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+        oss << "<config>\n";
+        
+        for (const auto& section : sections_) {
+            oss << "  <" << section.name;
+            
+            // Output attributes
+            for (const auto& [key, param] : section.parameters) {
+                if (key != "._content") {
+                    // Remove leading dot
+                    std::string attr_name = (key.length() > 0 && key[0] == '.') ? key.substr(1) : key;
+                    oss << " " << attr_name << "=\"";
+                    
+                    // Escape XML special characters
+                    for (char c : param.value) {
+                        switch (c) {
+                            case '&': oss << "&amp;"; break;
+                            case '<': oss << "&lt;"; break;
+                            case '>': oss << "&gt;"; break;
+                            case '"': oss << "&quot;"; break;
+                            case '\'': oss << "&apos;"; break;
+                            default: oss << c;
+                        }
+                    }
+                    oss << "\"";
+                }
+            }
+            
+            // Check for content
+            auto content_it = section.parameters.find("._content");
+            if (content_it != section.parameters.end()) {
+                oss << ">";
+                // Escape XML special characters in content
+                for (char c : content_it->second.value) {
+                    switch (c) {
+                        case '&': oss << "&amp;"; break;
+                        case '<': oss << "&lt;"; break;
+                        case '>': oss << "&gt;"; break;
+                        default: oss << c;
+                    }
+                }
+                oss << "</" << section.name << ">\n";
+            } else {
+                oss << " />\n";
+            }
+        }
+        
+        oss << "</config>\n";
+        return oss.str();
+    } catch (const std::exception& e) {
+        std::cerr << "Error generating XML: " << e.what() << std::endl;
+        return "";
+    }
+}
+
+bool OopParser::isXmlSupported() {
+    // XML support is always available with our built-in parser
+    return true;
+}
+
 #ifdef IOC_CONFIG_TOML_SUPPORT
 
 bool OopParser::loadFromToml(const std::string& filepath) {

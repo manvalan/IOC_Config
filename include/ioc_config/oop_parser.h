@@ -615,6 +615,83 @@ public:
      */
     static bool isXmlSupported();
 
+    // ============ CSV Support Methods ============
+
+    /**
+     * @brief Load configuration from CSV file
+     * @param filepath Path to CSV file
+     * @param hasHeader If true (default), first row is treated as column headers
+     * @return True if successful
+     * 
+     * @note CSV Structure Mapping:
+     * - First column treated as section name (with auto-detection)
+     * - If no explicit section column: uses first row as section
+     * - Subsequent columns map to parameters
+     * - Headers become parameter names with "." prefix
+     * - Values parsed as strings (type detection automatic)
+     * 
+     * @note CSV Parsing:
+     * - Follows RFC 4180 CSV standard
+     * - Supports quoted fields with embedded commas
+     * - Handles escaped quotes ("" within quoted fields)
+     * - Automatically detects delimiters (comma, semicolon, tab)
+     * - UTF-8 encoding assumed
+     * 
+     * @example
+     * @code
+     * Input CSV:
+     * section,id,name,type
+     * object,17030,Vesta,asteroid
+     * search,16.5,mag_limit,float
+     * 
+     * Produces:
+     * object: { .id: "17030", .name: "Vesta", .type: "asteroid" }
+     * search: { .16.5: "mag_limit", ... } (auto-detection based on content)
+     * @endcode
+     */
+    bool loadFromCsv(const std::string& filepath, bool hasHeader = true);
+
+    /**
+     * @brief Save configuration to CSV file
+     * @param filepath Path to CSV file to create/overwrite
+     * @param withHeader If true (default), write column headers
+     * @return True if successful
+     * 
+     * @note Output Format:
+     * - First column: section name
+     * - Subsequent columns: parameters (one per section parameter)
+     * - Values: parameter values from each section
+     * - Header row: "Section" + parameter names
+     * 
+     * @note All special characters properly escaped per RFC 4180
+     */
+    bool saveToCsv(const std::string& filepath, bool withHeader = true) const;
+
+    /**
+     * @brief Load configuration from CSV string
+     * @param csvString CSV content as string
+     * @param hasHeader If true (default), first row is treated as column headers
+     * @return True if successful, false otherwise
+     */
+    bool loadFromCsvString(const std::string& csvString, bool hasHeader = true);
+
+    /**
+     * @brief Save configuration to CSV string
+     * @param withHeader If true (default), include column headers
+     * @return CSV string representation of configuration
+     */
+    std::string saveToCsvString(bool withHeader = true) const;
+
+    /**
+     * @brief Detect CSV delimiter from content
+     * @param csvContent CSV content to analyze
+     * @return Detected delimiter character (',' ';' or '\t')
+     * 
+     * @note Static utility method
+     * @note Returns ',' if detection fails
+     */
+    static char detectCsvDelimiter(const std::string& csvContent);
+
     /**
      * @brief Load configuration from JSON object
      * @param jsonObj nlohmann::json object containing configuration

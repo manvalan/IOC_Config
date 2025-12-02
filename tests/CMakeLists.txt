@@ -60,3 +60,9 @@ target_link_libraries(test_xml PRIVATE ioc_config_static)
 target_include_directories(test_xml PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 add_test(NAME XmlTest COMMAND test_xml)
 
+# Test 11: CSV format support (NEW)
+add_executable(test_csv test_csv.cpp)
+target_link_libraries(test_csv PRIVATE ioc_config_static)
+target_include_directories(test_csv PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+add_test(NAME CsvTest COMMAND test_csv)
+

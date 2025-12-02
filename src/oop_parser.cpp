@@ -18,6 +18,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cmath>
+#include <set>
 
 // Include nlohmann/json for JSON support
 #include <nlohmann/json.hpp>
@@ -1552,6 +1553,279 @@ std::string OopParser::saveToXmlString() const {
 bool OopParser::isXmlSupported() {
     // XML support is always available with our built-in parser
     return true;
+}
+
+// ============ CSV Support Implementation ============
+
+char OopParser::detectCsvDelimiter(const std::string& csvContent) {
+    if (csvContent.empty()) {
+        return ',';
+    }
+    
+    // Count occurrences of common delimiters in first line
+    size_t first_line_end = csvContent.find('\n');
+    if (first_line_end == std::string::npos) {
+        first_line_end = csvContent.length();
+    }
+    
+    std::string first_line = csvContent.substr(0, first_line_end);
+    
+    size_t comma_count = 0, semicolon_count = 0, tab_count = 0;
+    bool in_quotes = false;
+    
+    for (char c : first_line) {
+        if (c == '"') {
+            in_quotes = !in_quotes;
+        } else if (!in_quotes) {
+            if (c == ',') comma_count++;
+            else if (c == ';') semicolon_count++;
+            else if (c == '\t') tab_count++;
+        }
+    }
+    
+    // Return delimiter with highest count
+    if (semicolon_count > comma_count && semicolon_count > tab_count) {
+        return ';';
+    } else if (tab_count > comma_count) {
+        return '\t';
+    }
+    return ',';
+}
+
+bool OopParser::loadFromCsv(const std::string& filepath, bool hasHeader) {
+    try {
+        std::ifstream file(filepath);
+        if (!file.is_open()) {
+            std::cerr << "Failed to open CSV file: " << filepath << std::endl;
+            return false;
+        }
+        
+        std::string content((std::istreambuf_iterator<char>(file)),
+                           std::istreambuf_iterator<char>());
+        file.close();
+        
+        return loadFromCsvString(content, hasHeader);
+    } catch (const std::exception& e) {
+        std::cerr << "Error loading CSV: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool OopParser::saveToCsv(const std::string& filepath, bool withHeader) const {
+    try {
+        std::string csv = saveToCsvString(withHeader);
+        if (csv.empty()) {
+            return false;
+        }
+        
+        std::ofstream file(filepath);
+        if (!file.is_open()) {
+            std::cerr << "Failed to create CSV file: " << filepath << std::endl;
+            return false;
+        }
+        
+        file << csv;
+        file.close();
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error saving CSV: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+bool OopParser::loadFromCsvString(const std::string& csvString, bool hasHeader) {
+    if (csvString.empty()) {
+        std::cerr << "Empty CSV string provided" << std::endl;
+        return false;
+    }
+    
+    try {
+        std::lock_guard<std::mutex> lock(sectionsMutex_);
+        clear();
+        
+        // Detect delimiter
+        char delimiter = detectCsvDelimiter(csvString);
+        
+        // Split into lines
+        std::vector<std::vector<std::string>> rows;
+        std::istringstream stream(csvString);
+        std::string line;
+        
+        while (std::getline(stream, line)) {
+            if (line.empty()) continue;
+            
+            std::vector<std::string> row;
+            std::string field;
+            bool in_quotes = false;
+            
+            for (size_t i = 0; i < line.length(); i++) {
+                char c = line[i];
+                
+                if (c == '"') {
+                    in_quotes = !in_quotes;
+                    // Include quotes in field if not at boundaries
+                    if (i > 0 && i < line.length() - 1) {
+                        field += c;
+                    }
+                } else if (c == delimiter && !in_quotes) {
+                    row.push_back(field);
+                    field.clear();
+                } else {
+                    field += c;
+                }
+            }
+            row.push_back(field);
+            rows.push_back(row);
+        }
+        
+        if (rows.empty()) {
+            return true; // Empty CSV
+        }
+        
+        // Process header
+        std::vector<std::string> headers;
+        size_t data_start = 0;
+        
+        if (hasHeader && !rows.empty()) {
+            headers = rows[0];
+            data_start = 1;
+            
+            // Clean headers
+            for (auto& h : headers) {
+                // Trim whitespace
+                size_t start = h.find_first_not_of(" \t");
+                size_t end = h.find_last_not_of(" \t");
+                if (start != std::string::npos) {
+                    h = h.substr(start, end - start + 1);
+                }
+            }
+        }
+        
+        // Process data rows
+        for (size_t i = data_start; i < rows.size(); i++) {
+            const auto& row = rows[i];
+            if (row.empty()) continue;
+            
+            // First column is section name
+            std::string section_name = row[0];
+            
+            // Trim whitespace
+            size_t start = section_name.find_first_not_of(" \t");
+            size_t end = section_name.find_last_not_of(" \t");
+            if (start != std::string::npos) {
+                section_name = section_name.substr(start, end - start + 1);
+            }
+            
+            if (section_name.empty()) continue;
+            
+            ConfigSectionData section;
+            section.name = section_name;
+            section.type = ConfigSectionData::stringToSectionType(section_name);
+            
+            // Add parameters for remaining columns
+            for (size_t j = 1; j < row.size(); j++) {
+                if (j >= headers.size() || headers[j].empty()) {
+                    continue;
+                }
+                
+                ConfigParameter param;
+                param.key = "." + headers[j];
+                param.value = row[j];
+                
+                // Trim whitespace from value
+                size_t v_start = param.value.find_first_not_of(" \t");
+                size_t v_end = param.value.find_last_not_of(" \t");
+                if (v_start != std::string::npos) {
+                    param.value = param.value.substr(v_start, v_end - v_start + 1);
+                }
+                
+                param.type = detectType(param.value);
+                section.parameters[param.key] = param;
+            }
+            
+            if (!section.parameters.empty()) {
+                sections_.push_back(section);
+            }
+        }
+        
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "Error parsing CSV: " << e.what() << std::endl;
+        return false;
+    }
+}
+
+std::string OopParser::saveToCsvString(bool withHeader) const {
+    try {
+        std::lock_guard<std::mutex> lock(sectionsMutex_);
+        
+        if (sections_.empty()) {
+            return "";
+        }
+        
+        std::ostringstream oss;
+        
+        // Collect all unique parameter keys
+        std::set<std::string> all_keys;
+        for (const auto& section : sections_) {
+            for (const auto& [key, param] : section.parameters) {
+                all_keys.insert(key);
+            }
+        }
+        
+        std::vector<std::string> sorted_keys(all_keys.begin(), all_keys.end());
+        
+        // Write header if requested
+        if (withHeader) {
+            oss << "Section";
+            for (const auto& key : sorted_keys) {
+                oss << ",";
+                // Remove leading dot for header
+                std::string header_name = (key.length() > 0 && key[0] == '.') ? key.substr(1) : key;
+                oss << "\"" << header_name << "\"";
+            }
+            oss << "\n";
+        }
+        
+        // Write data rows
+        for (const auto& section : sections_) {
+            oss << section.name;
+            
+            for (const auto& key : sorted_keys) {
+                oss << ",";
+                
+                auto it = section.parameters.find(key);
+                if (it != section.parameters.end()) {
+                    const auto& value = it->second.value;
+                    
+                    // Quote if contains comma, quotes, or newlines
+                    if (value.find(',') != std::string::npos ||
+                        value.find('"') != std::string::npos ||
+                        value.find('\n') != std::string::npos) {
+                        
+                        oss << "\"";
+                        for (char c : value) {
+                            if (c == '"') {
+                                oss << "\"\""; // Escape quotes
+                            } else {
+                                oss << c;
+                            }
+                        }
+                        oss << "\"";
+                    } else {
+                        oss << value;
+                    }
+                }
+            }
+            
+            oss << "\n";
+        }
+        
+        return oss.str();
+    } catch (const std::exception& e) {
+        std::cerr << "Error generating CSV: " << e.what() << std::endl;
+        return "";
+    }
 }
 
 #ifdef IOC_CONFIG_TOML_SUPPORT

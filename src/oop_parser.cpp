@@ -302,6 +302,8 @@ bool OopParser::loadFromOop(const std::string& filepath) {
         return false;
     }
 
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+    
     clear();
     std::string line;
     ConfigSectionData currentSection;
@@ -476,6 +478,8 @@ const ConfigSectionData* OopParser::getSection(const std::string& name) const {
 bool OopParser::setParameter(const std::string& sectionName, 
                              const std::string& paramKey, 
                              const std::string& value) {
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
+    
     ConfigSectionData* section = getSection(sectionName);
     if (!section) {
         // Create new section if it doesn't exist
@@ -543,6 +547,7 @@ void OopParser::clear() {
 }
 
 size_t OopParser::getSectionCount() const {
+    std::lock_guard<std::mutex> lock(sectionsMutex_);
     return sections_.size();
 }
 
@@ -1105,18 +1110,18 @@ ConfigBuilder& ConfigBuilder::addParameters(const std::map<std::string, std::str
     return *this;
 }
 
-OopParser ConfigBuilder::build() const {
-    OopParser parser;
+std::unique_ptr<OopParser> ConfigBuilder::build() const {
+    auto parser = std::make_unique<OopParser>();
     for (const auto& section : sections_) {
         // We need to set parameters through the parser
         for (const auto& [key, param] : section.parameters) {
-            parser.setParameter(section.name, key, param.value);
+            parser->setParameter(section.name, key, param.value);
         }
     }
     return parser;
 }
 
-OopParser ConfigBuilder::getParser() const {
+std::unique_ptr<OopParser> ConfigBuilder::getParser() const {
     return build();
 }
 

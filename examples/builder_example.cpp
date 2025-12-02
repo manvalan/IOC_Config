@@ -57,13 +57,13 @@ int main() {
         std::cout << "2. Saving to OOP format...\n";
         std::string oop_file = "/tmp/config_built.oop";
         
-        if (parser.saveToOop(oop_file)) {
+        if (parser->saveToOop(oop_file)) {
             std::cout << "✓ Saved to: " << oop_file << "\n\n";
         }
 
         // ========== Example 3: Convert to JSON ==========
         std::cout << "3. Converting to JSON...\n";
-        std::string json_str = parser.toJsonString();
+        std::string json_str = parser->toJsonString();
         std::cout << "✓ JSON Output:\n";
         std::cout << json_str << "\n\n";
 
@@ -72,7 +72,7 @@ int main() {
         ConfigSchema schema = OopParser::createDefaultSchema();
         
         std::vector<std::string> errors;
-        if (parser.validateWithSchema(schema, errors)) {
+        if (parser->validateWithSchema(schema, errors)) {
             std::cout << "✓ Configuration is valid against default schema\n\n";
         } else {
             std::cout << "✗ Validation errors:\n";
@@ -120,7 +120,7 @@ int main() {
         std::cout << "7. Copying sections between parsers...\n";
         
         ConfigBuilder builder3;
-        builder3.addSectionFrom(parser, "object")  // Copy from first parser
+        builder3.addSectionFrom(*parser, "object")  // Copy from first parser
                 .addSection("database")
                 .addParameter("type", "sqlite")
                 .addParameter("path", "/path/to/asteroids.db");

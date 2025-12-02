@@ -19,6 +19,7 @@
 #include <map>
 #include <memory>
 #include <stdexcept>
+#include <mutex>
 #include <nlohmann/json.hpp>
 
 namespace ioc_config {
@@ -287,14 +288,14 @@ public:
     ~OopParser() = default;
 
     /**
-     * @brief Move constructor
+     * @brief Move constructor (disabled due to mutex)
      */
-    OopParser(OopParser&&) = default;
+    OopParser(OopParser&&) = delete;
 
     /**
-     * @brief Move assignment operator
+     * @brief Move assignment operator (disabled due to mutex)
      */
-    OopParser& operator=(OopParser&&) = default;
+    OopParser& operator=(OopParser&&) = delete;
 
     // Disable copy semantics
     OopParser(const OopParser&) = delete;
@@ -530,6 +531,7 @@ private:
     std::vector<ConfigSectionData> sections_;           ///< Configuration sections
     mutable std::string lastError_;                     ///< Last error message
     std::unique_ptr<ConfigSchema> schema_;              ///< Current validation schema
+    mutable std::mutex sectionsMutex_;                  ///< Mutex for thread-safe section access
 
     /**
      * @brief Parse a single line from OOP file
@@ -623,15 +625,15 @@ public:
 
     /**
      * @brief Build and return the OopParser
-     * @return Constructed OopParser with all sections and parameters
+     * @return Pointer to constructed OopParser with all sections and parameters
      */
-    OopParser build() const;
+    std::unique_ptr<OopParser> build() const;
 
     /**
      * @brief Get the parser without resetting builder state
-     * @return Copy of current parser state
+     * @return Pointer to copy of current parser state
      */
-    OopParser getParser() const;
+    std::unique_ptr<OopParser> getParser() const;
 
     /**
      * @brief Clear all sections (reset builder)

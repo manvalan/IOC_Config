@@ -26,20 +26,20 @@ void testConfigBuilder() {
                .endSection();
         
         // Get the built parser
-        OopParser parser = builder.build();
+        auto parser = builder.build();
         
         // Verify sections
         assert(builder.getSectionCount() == 3);
         std::cout << "✓ Created " << builder.getSectionCount() << " sections\n";
         
         // Verify parameters
-        auto object_section = parser.getSection("object");
+        auto object_section = parser->getSection("object");
         assert(object_section != nullptr);
         assert(object_section->getParameter("id") != nullptr);
         assert(object_section->getParameter("id")->asString() == "17030");
         std::cout << "✓ Object section has correct parameters\n";
         
-        auto time_section = parser.getSection("time");
+        auto time_section = parser->getSection("time");
         assert(time_section != nullptr);
         assert(time_section->parameters.size() == 2);
         std::cout << "✓ Time section has 2 parameters\n";
@@ -245,22 +245,22 @@ void testBuilderFromParser() {
                .addParameter("id", "999")
                .addParameter("name", "Test");
         
-        OopParser parser = initial.build();
+        auto parser = initial.build();
         
         // Create new builder and copy section from parser
         ConfigBuilder builder2;
-        builder2.addSectionFrom(parser, "object")
+        builder2.addSectionFrom(*parser, "object")
                 .addSection("search")
                 .addParameter("max_magnitude", "15");
         
-        OopParser parser2 = builder2.build();
+        auto parser2 = builder2.build();
         
         // Verify
-        auto obj_sec = parser2.getSection("object");
+        auto obj_sec = parser2->getSection("object");
         assert(obj_sec != nullptr);
         assert(obj_sec->getParameter("id")->asString() == "999");
         
-        auto search_sec = parser2.getSection("search");
+        auto search_sec = parser2->getSection("search");
         assert(search_sec != nullptr);
         
         std::cout << "✓ Successfully copied section from parser\n";

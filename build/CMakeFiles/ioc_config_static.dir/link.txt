@@ -1,0 +1,2 @@
+/usr/bin/ar qc libioc_config.a CMakeFiles/ioc_config_static.dir/src/oop_parser.cpp.o
+/usr/bin/ranlib libioc_config.a

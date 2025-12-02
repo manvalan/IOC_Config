@@ -1,0 +1,276 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IOC_Config Configuration Schema",
+  "description": "JSON schema for IOccultCalc configuration files",
+  "type": "object",
+  "required": ["object", "time", "search"],
+  "properties": {
+    "object": {
+      "type": "object",
+      "description": "Target object configuration",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Object identifier (e.g., asteroid number)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Object name"
+        }
+      },
+      "required": ["id", "name"]
+    },
+    "propag": {
+      "type": "object",
+      "description": "Propagation settings",
+      "properties": {
+        "start_jd": {
+          "type": "number",
+          "description": "Start Julian Date"
+        },
+        "end_jd": {
+          "type": "number",
+          "description": "End Julian Date"
+        },
+        "step_size": {
+          "type": "number",
+          "description": "Integration step size in days",
+          "minimum": 0.001
+        },
+        "type": {
+          "type": "string",
+          "enum": ["RKF78", "RK4", "RK45"],
+          "description": "Integration method"
+        }
+      }
+    },
+    "asteroids": {
+      "type": "object",
+      "description": "Asteroid selection settings",
+      "properties": {
+        "selection_mode": {
+          "type": "string",
+          "enum": ["file", "database", "manual"],
+          "description": "How to select asteroids"
+        },
+        "additional_files": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of asteroid files"
+        },
+        "file_format": {
+          "type": "string",
+          "enum": ["auto_detect", "mpc", "csv", "binary"],
+          "description": "Format of asteroid files"
+        }
+      }
+    },
+    "time": {
+      "type": "object",
+      "description": "Time range configuration",
+      "properties": {
+        "start_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Start date (YYYY-MM-DD)"
+        },
+        "end_date": {
+          "type": "string",
+          "format": "date",
+          "description": "End date (YYYY-MM-DD)"
+        },
+        "interval_days": {
+          "type": "number",
+          "description": "Time interval in days",
+          "minimum": 0
+        }
+      },
+      "required": ["start_date", "end_date"]
+    },
+    "search": {
+      "type": "object",
+      "description": "Occultation search parameters",
+      "properties": {
+        "start_jd": {
+          "type": "number",
+          "description": "Search start Julian Date"
+        },
+        "end_jd": {
+          "type": "number",
+          "description": "Search end Julian Date"
+        },
+        "max_magnitude": {
+          "type": "number",
+          "description": "Maximum magnitude for stars",
+          "maximum": 20
+        },
+        "min_duration_sec": {
+          "type": "number",
+          "description": "Minimum occultation duration in seconds",
+          "minimum": 0
+        },
+        "min_elevation_deg": {
+          "type": "number",
+          "description": "Minimum elevation in degrees",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "search_radius_deg": {
+          "type": "number",
+          "description": "Search radius in degrees",
+          "minimum": 0
+        }
+      }
+    },
+    "database": {
+      "type": "object",
+      "description": "Star catalog database settings",
+      "properties": {
+        "catalog_format": {
+          "type": "string",
+          "enum": ["multifile_v1", "multifile_v2", "single_file"],
+          "description": "Catalog format"
+        },
+        "catalog_path": {
+          "type": "string",
+          "description": "Path to catalog database"
+        },
+        "enable_caching": {
+          "type": "boolean",
+          "description": "Enable caching"
+        },
+        "cache_directory": {
+          "type": "string",
+          "description": "Cache directory path"
+        }
+      }
+    },
+    "gaia": {
+      "type": "object",
+      "description": "GAIA catalog specific settings",
+      "properties": {
+        "version": {
+          "type": "string",
+          "enum": ["DR2", "DR3", "DR4"],
+          "description": "GAIA data release version"
+        },
+        "use_local_cache": {
+          "type": "boolean",
+          "description": "Use local cached data"
+        },
+        "cache_directory": {
+          "type": "string",
+          "description": "Local cache directory"
+        }
+      }
+    },
+    "observer": {
+      "type": "object",
+      "description": "Observer location",
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "description": "Latitude in degrees",
+          "minimum": -90,
+          "maximum": 90
+        },
+        "longitude": {
+          "type": "number",
+          "description": "Longitude in degrees",
+          "minimum": -180,
+          "maximum": 180
+        },
+        "altitude": {
+          "type": "number",
+          "description": "Altitude in meters",
+          "minimum": -500
+        },
+        "site_name": {
+          "type": "string",
+          "description": "Name of observation site"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "description": "Output configuration",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": ["csv", "json", "fits", "text"],
+          "description": "Output format"
+        },
+        "filename_prefix": {
+          "type": "string",
+          "description": "Prefix for output files"
+        },
+        "verbosity": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3,
+          "description": "Verbosity level"
+        }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "description": "Performance tuning",
+      "properties": {
+        "use_parallel": {
+          "type": "boolean",
+          "description": "Enable parallel processing"
+        },
+        "num_threads": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of threads"
+        }
+      }
+    },
+    "occultation": {
+      "type": "object",
+      "description": "Occultation calculation parameters",
+      "properties": {
+        "use_chebyshev": {
+          "type": "boolean",
+          "description": "Use Chebyshev polynomial approximation"
+        },
+        "chebyshev_order": {
+          "type": "integer",
+          "minimum": 5,
+          "description": "Chebyshev polynomial order"
+        },
+        "include_perturbations": {
+          "type": "boolean",
+          "description": "Include planetary perturbations"
+        },
+        "perturbing_bodies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of perturbing bodies"
+        }
+      }
+    },
+    "filters": {
+      "type": "object",
+      "description": "Result filtering options",
+      "properties": {
+        "min_probability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Minimum occurrence probability"
+        },
+        "max_uncertainty_km": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum uncertainty in km"
+        }
+      }
+    }
+  }
+}

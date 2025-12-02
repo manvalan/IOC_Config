@@ -1,0 +1,76 @@
+{
+  "object": {
+    "id": "17030",
+    "name": "17030 Sierks"
+  },
+  "propag": {
+    "start_jd": 2460638.5,
+    "end_jd": 2460645.5,
+    "step_size": 0.01,
+    "type": "RKF78"
+  },
+  "asteroids": {
+    "selection_mode": "file",
+    "additional_files": [
+      "asteroid_17030_only.txt"
+    ],
+    "file_format": "auto_detect"
+  },
+  "time": {
+    "start_date": "2025-11-25",
+    "end_date": "2025-12-02",
+    "interval_days": 0.25
+  },
+  "search": {
+    "start_jd": 2460638.5,
+    "end_jd": 2460645.5,
+    "max_magnitude": 16.0,
+    "min_duration_sec": 0.1,
+    "min_elevation_deg": 20.0,
+    "search_radius_deg": 10.0
+  },
+  "database": {
+    "catalog_format": "multifile_v2",
+    "catalog_path": "~/.catalog/gaia_mag18_v2_multifile",
+    "enable_caching": true,
+    "cache_directory": "~/.catalog"
+  },
+  "gaia": {
+    "version": "DR3",
+    "use_local_cache": true,
+    "cache_directory": "~/.catalog"
+  },
+  "observer": {
+    "latitude": 42.0,
+    "longitude": 12.0,
+    "altitude": 100.0,
+    "site_name": "Italia Centrale"
+  },
+  "output": {
+    "format": "csv",
+    "filename_prefix": "17030_nov2025",
+    "verbosity": 2
+  },
+  "performance": {
+    "use_parallel": false,
+    "num_threads": 1
+  },
+  "occultation": {
+    "use_chebyshev": true,
+    "chebyshev_order": 11,
+    "chebyshev_interval_days": 1.0,
+    "include_perturbations": true,
+    "perturbing_bodies": [
+      "sun",
+      "jupiter",
+      "saturn"
+    ],
+    "relativistic_corrections": false,
+    "light_time_correction": true
+  },
+  "filters": {
+    "min_probability": 0.01,
+    "max_uncertainty_km": 1000.0,
+    "min_mag_drop": 0.1
+  }
+}

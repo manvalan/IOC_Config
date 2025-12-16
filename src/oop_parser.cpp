@@ -25,14 +25,10 @@
 #include <nlohmann/json.hpp>
 
 // Include yaml-cpp for YAML support (if available)
-#ifdef IOC_CONFIG_YAML_SUPPORT
 #include <yaml-cpp/yaml.h>
-#endif
 
 // Include toml11 for TOML support (if available)
-#ifdef IOC_CONFIG_TOML_SUPPORT
 #include <toml.hpp>
-#endif
 
 using json = nlohmann::json;
 
@@ -1172,136 +1168,6 @@ std::vector<std::string> ConfigBuilder::getSectionNames() const {
     return names;
 }
 
-// ============ YAML Support Methods ============
-
-#ifdef IOC_CONFIG_YAML_SUPPORT
-
-bool OopParser::loadFromYaml(const std::string& filepath) {
-    try {
-        std::ifstream file(filepath);
-        if (!file.is_open()) {
-            return false;
-        }
-        
-        YAML::Node config = YAML::LoadFile(filepath);
-        return loadFromYamlNode(config);
-    } catch (const std::exception& e) {
-        std::cerr << "YAML load error: " << e.what() << std::endl;
-        return false;
-    }
-}
-
-bool OopParser::saveToYaml(const std::string& filepath) const {
-    try {
-        YAML::Node config;
-        
-        // Convert sections to YAML
-        for (const auto& section : sections_) {
-            YAML::Node sectionNode;
-            
-            for (const auto& param : section.parameters) {
-                sectionNode[param.key] = param.value;
-            }
-            
-            config[section.name] = sectionNode;
-        }
-        
-        std::ofstream file(filepath);
-        if (!file.is_open()) {
-            return false;
-        }
-        
-        file << config;
-        return true;
-    } catch (const std::exception& e) {
-        std::cerr << "YAML save error: " << e.what() << std::endl;
-        return false;
-    }
-}
-
-bool OopParser::loadFromYamlString(const std::string& yamlString) {
-    try {
-        YAML::Node config = YAML::Load(yamlString);
-        return loadFromYamlNode(config);
-    } catch (const std::exception& e) {
-        std::cerr << "YAML parse error: " << e.what() << std::endl;
-        return false;
-    }
-}
-
-std::string OopParser::saveToYamlString() const {
-    try {
-        YAML::Node config;
-        
-        // Convert sections to YAML
-        for (const auto& section : sections_) {
-            YAML::Node sectionNode;
-            
-            for (const auto& param : section.parameters) {
-                sectionNode[param.key] = param.value;
-            }
-            
-            config[section.name] = sectionNode;
-        }
-        
-        YAML::Emitter emitter;
-        emitter << config;
-        return emitter.c_str();
-    } catch (const std::exception& e) {
-        std::cerr << "YAML format error: " << e.what() << std::endl;
-        return "";
-    }
-}
-
-// Helper method to load from YAML node
-bool OopParser::loadFromYamlNode(const YAML::Node& config) {
-    try {
-        for (YAML::const_iterator it = config.begin(); it != config.end(); ++it) {
-            std::string sectionName = it->first.as<std::string>();
-            const YAML::Node& sectionNode = it->second;
-            
-            if (sectionNode.IsMap()) {
-                for (YAML::const_iterator paramIt = sectionNode.begin(); 
-                     paramIt != sectionNode.end(); ++paramIt) {
-                    std::string paramKey = paramIt->first.as<std::string>();
-                    std::string paramValue = paramIt->second.as<std::string>();
-                    
-                    setParameter(sectionName, paramKey, paramValue);
-                }
-            }
-        }
-        return true;
-    } catch (const std::exception& e) {
-        std::cerr << "YAML node load error: " << e.what() << std::endl;
-        return false;
-    }
-}
-
-#else
-
-// Stub implementations when YAML support is disabled
-bool OopParser::loadFromYaml(const std::string& filepath) {
-    std::cerr << "YAML support not available (yaml-cpp not found)" << std::endl;
-    return false;
-}
-
-bool OopParser::saveToYaml(const std::string& filepath) const {
-    std::cerr << "YAML support not available (yaml-cpp not found)" << std::endl;
-    return false;
-}
-
-bool OopParser::loadFromYamlString(const std::string& yamlString) {
-    std::cerr << "YAML support not available (yaml-cpp not found)" << std::endl;
-    return false;
-}
-
-std::string OopParser::saveToYamlString() const {
-    std::cerr << "YAML support not available (yaml-cpp not found)" << std::endl;
-    return "";
-}
-
-#endif
-
 // ============ XML Support Implementation ============
 
 #include <cstring>
@@ -1871,7 +1737,198 @@ std::string OopParser::saveToCsvString(bool withHeader) const {
     }
 }
 
-#ifdef IOC_CONFIG_TOML_SUPPORT
+// ============ YAML Support Methods ============
+
+bool OopParser::loadFromYaml(const std::string& filepath) {
+    try {
+        YAML::Node config = YAML::LoadFile(filepath);
+        if (config.IsNull()) {
+            return false;
+        }
+        
+        return loadFromYamlNode(config);
+    } catch (const std::exception& e) {
+        lastError_ = "YAML parsing error: " + std::string(e.what());
+        return false;
+    }
+}
+
+bool OopParser::loadFromYamlNode(const YAML::Node& config) {
+    try {
+        // Convert YAML node to our structure
+        clear();
+        
+        if (config.IsMap()) {
+            for (auto it = config.begin(); it != config.end(); ++it) {
+                std::string sectionName = it->first.as<std::string>();
+                ConfigSectionData section;
+                section.name = sectionName;
+                section.type = ConfigSectionData::stringToSectionType(sectionName);
+                
+                if (it->second.IsMap()) {
+                    for (auto paramIt = it->second.begin(); paramIt != it->second.end(); ++paramIt) {
+                        std::string key = paramIt->first.as<std::string>();
+                        std::string value;
+                        
+                        // Handle different value types
+                        if (paramIt->second.IsSequence()) {
+                            std::stringstream ss;
+                            ss << "[";
+                            for (size_t i = 0; i < paramIt->second.size(); ++i) {
+                                if (i > 0) ss << ", ";
+                                ss << paramIt->second[i].as<std::string>();
+                            }
+                            ss << "]";
+                            value = ss.str();
+                        } else {
+                            value = paramIt->second.as<std::string>();
+                        }
+                        
+                        // Add dot prefix if missing (internal convention for parameters)
+                        // Actually, in our internal map we store keys as is, but let's check
+                        // if we need to clean up keys.
+                        
+                        ConfigParameter param;
+                        param.key = key;
+                        
+                        // Handle quotes for strings
+                        if (!value.empty() && 
+                            ((value.front() == '\'' && value.back() == '\'') || 
+                             (value.front() == '"' && value.back() == '"'))) {
+                             // Keep quotes if they are part of the value
+                        } else {
+                            // Quote strings if needed? 
+                            // For now, keep as is
+                        }
+                        
+                        param.value = value;
+                        param.type = detectType(value);
+                        section.parameters[key] = param;
+                    }
+                }
+                
+                sections_.push_back(section);
+            }
+        }
+        
+        return true;
+    } catch (const std::exception& e) {
+        lastError_ = "YAML node parsing error: " + std::string(e.what());
+        return false;
+    }
+}
+
+
+bool OopParser::saveToYaml(const std::string& filepath) const {
+    try {
+        YAML::Emitter out;
+        out << YAML::BeginMap;
+        
+        for (const auto& section : sections_) {
+            out << YAML::Key << section.name; 
+            out << YAML::Value << YAML::BeginMap;
+            
+            for (const auto& [key, param] : section.parameters) {
+                // Determine if key needs dot prefix removal
+                std::string clean_key = key;
+                if (clean_key[0] == '.') {
+                    clean_key = clean_key.substr(1);
+                }
+                
+                out << YAML::Key << clean_key;
+                
+                // Try to determine type for output
+                if (param.type == "int") {
+                    try {
+                        out << YAML::Value << std::stoi(param.value);
+                    } catch (...) {
+                        out << YAML::Value << param.value;
+                    }
+                } else if (param.type == "float") {
+                    try {
+                        out << YAML::Value << std::stod(param.value);
+                    } catch (...) {
+                        out << YAML::Value << param.value;
+                    }
+                } else if (param.type == "bool") {
+                    std::string lower = param.value;
+                    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+                    bool val = (lower == ".true." || lower == "true" || lower == "1");
+                    out << YAML::Value << val;
+                } else {
+                    // String - remove quotes if present for cleaner YAML
+                    std::string val = param.value;
+                    if (!val.empty() && val.front() == '\'' && val.back() == '\'') {
+                        val = val.substr(1, val.length() - 2);
+                    }
+                    out << YAML::Value << val;
+                }
+            }
+            
+            out << YAML::EndMap;
+        }
+        
+        out << YAML::EndMap;
+        
+        std::ofstream file(filepath);
+        file << out.c_str();
+        file.close();
+        
+        return true;
+    } catch (const std::exception& e) {
+        lastError_ = "YAML serialization error: " + std::string(e.what());
+        return false;
+    }
+}
+
+bool OopParser::loadFromYamlString(const std::string& yamlString) {
+    try {
+        YAML::Node config = YAML::Load(yamlString);
+        return loadFromYamlNode(config);
+    } catch (const std::exception& e) {
+        lastError_ = "YAML parsing error: " + std::string(e.what());
+        return false;
+    }
+}
+
+std::string OopParser::saveToYamlString() const {
+    try {
+        YAML::Emitter out;
+        out << YAML::BeginMap;
+        
+        for (const auto& section : sections_) {
+            out << YAML::Key << section.name; 
+            out << YAML::Value << YAML::BeginMap;
+            
+            for (const auto& [key, param] : section.parameters) {
+                std::string clean_key = key;
+                if (clean_key[0] == '.') clean_key = clean_key.substr(1);
+                
+                out << YAML::Key << clean_key;
+                
+                if (param.type == "int") {
+                     try { out << YAML::Value << std::stoi(param.value); } catch(...) { out << YAML::Value << param.value; }
+                } else if (param.type == "float") {
+                     try { out << YAML::Value << std::stod(param.value); } catch(...) { out << YAML::Value << param.value; }
+                } else if (param.type == "bool") {
+                    std::string lower = param.value;
+                    std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+                    out << YAML::Value << (lower == ".true." || lower == "true" || lower == "1");
+                } else {
+                    std::string val = param.value;
+                    if (!val.empty() && val.front() == '\'' && val.back() == '\'') val = val.substr(1, val.length() - 2);
+                    out << YAML::Value << val;
+                }
+            }
+            out << YAML::EndMap;
+        }
+        out << YAML::EndMap;
+        
+        return std::string(out.c_str());
+    } catch (...) {
+        return "";
+    }
+}
 
 bool OopParser::loadFromToml(const std::string& filepath) {
     try {
@@ -1880,13 +1937,13 @@ bool OopParser::loadFromToml(const std::string& filepath) {
         clear();
         const auto data = toml::parse(filepath);
         
-        for (const auto& [section_name, section_value] : data) {
+        for (const auto& [section_name, section_value] : data.as_table()) {
             ConfigSectionData section;
             section.name = section_name;
             section.type = ConfigSectionData::stringToSectionType(section_name);
             
             if (section_value.is_table()) {
-                for (const auto& [key, value] : *section_value.as_table()) {
+                for (const auto& [key, value] : section_value.as_table()) {
                     ConfigParameter param;
                     param.key = "." + key;
                     
@@ -1935,17 +1992,25 @@ bool OopParser::saveToToml(const std::string& filepath) const {
                 }
                 
                 if (param.type == "int") {
-                    section_table.insert(clean_key, std::stoll(param.value));
+                    try {
+                        section_table[clean_key] = std::stoll(param.value);
+                    } catch (...) {
+                         section_table[clean_key] = param.value;
+                    }
                 } else if (param.type == "float") {
-                    section_table.insert(clean_key, std::stod(param.value));
+                    try {
+                        section_table[clean_key] = std::stod(param.value);
+                    } catch (...) {
+                         section_table[clean_key] = param.value;
+                    }
                 } else if (param.type == "bool") {
-                    section_table.insert(clean_key, param.value == "true");
+                    section_table[clean_key] = (param.value == "true");
                 } else {
-                    section_table.insert(clean_key, param.value);
+                    section_table[clean_key] = param.value;
                 }
             }
             
-            root.insert(section.name, section_table);
+            root[section.name] = section_table;
         }
         
         std::ofstream file(filepath);
@@ -1954,7 +2019,7 @@ bool OopParser::saveToToml(const std::string& filepath) const {
             return false;
         }
         
-        file << root;
+        file << toml::value(root);
         file.close();
         
         return true;
@@ -1973,13 +2038,13 @@ bool OopParser::loadFromTomlString(const std::string& tomlString) {
         std::istringstream stream(tomlString);
         const auto data = toml::parse(stream);
         
-        for (const auto& [section_name, section_value] : data) {
+        for (const auto& [section_name, section_value] : data.as_table()) {
             ConfigSectionData section;
             section.name = section_name;
             section.type = ConfigSectionData::stringToSectionType(section_name);
             
             if (section_value.is_table()) {
-                for (const auto& [key, value] : *section_value.as_table()) {
+                for (const auto& [key, value] : section_value.as_table()) {
                     ConfigParameter param;
                     param.key = "." + key;
                     
@@ -2028,52 +2093,34 @@ std::string OopParser::saveToTomlString() const {
                 }
                 
                 if (param.type == "int") {
-                    section_table.insert(clean_key, std::stoll(param.value));
+                    try {
+                        section_table[clean_key] = std::stoll(param.value);
+                    } catch (...) {
+                         section_table[clean_key] = param.value;
+                    }
                 } else if (param.type == "float") {
-                    section_table.insert(clean_key, std::stod(param.value));
+                    try {
+                        section_table[clean_key] = std::stod(param.value);
+                    } catch (...) {
+                         section_table[clean_key] = param.value;
+                    }
                 } else if (param.type == "bool") {
-                    section_table.insert(clean_key, param.value == "true");
+                    section_table[clean_key] = (param.value == "true");
                 } else {
-                    section_table.insert(clean_key, param.value);
+                    section_table[clean_key] = param.value;
                 }
             }
             
-            root.insert(section.name, section_table);
+            root[section.name] = section_table;
         }
         
         std::ostringstream oss;
-        oss << root;
+        oss << toml::value(root);
         return oss.str();
     } catch (const std::exception& e) {
         return "";
     }
 }
-
-#else
-
-// Stub implementations when TOML support is disabled
-bool OopParser::loadFromToml(const std::string&) {
-    lastError_ = "TOML support not available (toml11 not found)";
-    std::cerr << lastError_ << "\n";
-    return false;
-}
-
-bool OopParser::saveToToml(const std::string&) const {
-    std::cerr << "TOML support not available (toml11 not found)\n";
-    return false;
-}
-
-bool OopParser::loadFromTomlString(const std::string&) {
-    lastError_ = "TOML support not available (toml11 not found)";
-    std::cerr << lastError_ << "\n";
-    return false;
-}
-
-std::string OopParser::saveToTomlString() const {
-    return "";
-}
-
-#endif
 
 // ============ Merge & Diff Implementation ============
 

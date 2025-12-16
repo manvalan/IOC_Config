@@ -24,6 +24,7 @@
 #include <regex>
 #include <sstream>
 #include <nlohmann/json.hpp>
+#include <yaml-cpp/yaml.h>
 
 namespace ioc_config {
 
@@ -1068,14 +1069,12 @@ private:
      */
     static std::vector<std::string> parseArrayValue(const std::string& value);
 
-#ifdef IOC_CONFIG_YAML_SUPPORT
     /**
      * @brief Parse a YAML node into configuration sections
      * @param config YAML node to parse
      * @return True if parsing was successful
      */
     bool loadFromYamlNode(const YAML::Node& config);
-#endif
 };
 
 /**

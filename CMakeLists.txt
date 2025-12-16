@@ -23,38 +23,37 @@ endif()
 # Find nlohmann_json
 find_package(nlohmann_json REQUIRED)
 
-# Find yaml-cpp (optional, for YAML support)
+# Include FetchContent for automatic dependency management
+include(FetchContent)
+
+# --- YAML-CPP Support (Mandatory) ---
 find_package(yaml-cpp CONFIG QUIET)
 if(NOT yaml-cpp_FOUND)
-    message(STATUS "yaml-cpp not found via find_package, trying pkg-config...")
-    find_package(PkgConfig QUIET)
-    if(PkgConfig_FOUND)
-        pkg_check_modules(yaml-cpp yaml-cpp)
-    endif()
-endif()
-
-if(yaml-cpp_FOUND)
-    message(STATUS "yaml-cpp found, YAML support will be enabled")
+    message(STATUS "yaml-cpp not found via find_package, fetching from GitHub...")
+    FetchContent_Declare(
+        yaml-cpp
+        GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+        GIT_TAG        0.8.0
+    )
+    FetchContent_MakeAvailable(yaml-cpp)
+    message(STATUS "yaml-cpp fetched and ready.")
 else()
-    message(WARNING "yaml-cpp not found, YAML support will be disabled")
-    message(STATUS "To install yaml-cpp: brew install yaml-cpp (macOS) or apt-get install libyaml-cpp-dev (Linux)")
+    message(STATUS "yaml-cpp found on system.")
 endif()
 
-# Find toml11 (optional, for TOML support)
+# --- TOML11 Support (Mandatory) ---
 find_package(toml11 CONFIG QUIET)
 if(NOT toml11_FOUND)
-    message(STATUS "toml11 not found via find_package, trying pkg-config...")
-    find_package(PkgConfig QUIET)
-    if(PkgConfig_FOUND)
-        pkg_check_modules(toml11 toml11)
-    endif()
-endif()
-
-if(toml11_FOUND)
-    message(STATUS "toml11 found, TOML support will be enabled")
+    message(STATUS "toml11 not found via find_package, fetching from GitHub...")
+    FetchContent_Declare(
+        toml11
+        GIT_REPOSITORY https://github.com/ToruNiina/toml11.git
+        GIT_TAG        v3.7.1
+    )
+    FetchContent_MakeAvailable(toml11)
+    message(STATUS "toml11 fetched and ready.")
 else()
-    message(WARNING "toml11 not found, TOML support will be disabled")
-    message(STATUS "To install toml11: brew install toml11 (macOS) or apt-get install libtoml11-dev (Linux)")
+    message(STATUS "toml11 found on system.")
 endif()
 
 # Include directories
@@ -68,27 +67,32 @@ set(SOURCES
 # Create static library
 add_library(ioc_config_static STATIC ${SOURCES})
 target_link_libraries(ioc_config_static PUBLIC nlohmann_json::nlohmann_json)
-if(yaml-cpp_FOUND)
+if(TARGET yaml-cpp::yaml-cpp)
     target_link_libraries(ioc_config_static PUBLIC yaml-cpp::yaml-cpp)
-    target_compile_definitions(ioc_config_static PRIVATE IOC_CONFIG_YAML_SUPPORT)
+else()
+    target_link_libraries(ioc_config_static PUBLIC yaml-cpp)
 endif()
-if(toml11_FOUND)
+if(TARGET toml11::toml11)
     target_link_libraries(ioc_config_static PUBLIC toml11::toml11)
-    target_compile_definitions(ioc_config_static PRIVATE IOC_CONFIG_TOML_SUPPORT)
+else()
+    # If built via FetchContent (header only) it might not export the namespace target appropriately depending on version
+    # But usually toml11 does. Let's assume toml11_dep if FetchContent created it, or manually add include dir
+    # To be safe with FetchContent of toml11, we often just need the include path as it is header-only
+    target_link_libraries(ioc_config_static PUBLIC toml11::toml11)
 endif()
+
 set_target_properties(ioc_config_static PROPERTIES OUTPUT_NAME ioc_config)
 
 # Create shared library
 add_library(ioc_config_shared SHARED ${SOURCES})
 target_link_libraries(ioc_config_shared PUBLIC nlohmann_json::nlohmann_json)
-if(yaml-cpp_FOUND)
+if(TARGET yaml-cpp::yaml-cpp)
     target_link_libraries(ioc_config_shared PUBLIC yaml-cpp::yaml-cpp)
-    target_compile_definitions(ioc_config_shared PRIVATE IOC_CONFIG_YAML_SUPPORT)
+else()
+    target_link_libraries(ioc_config_shared PUBLIC yaml-cpp)
 endif()
-if(toml11_FOUND)
-    target_link_libraries(ioc_config_shared PUBLIC toml11::toml11)
-    target_compile_definitions(ioc_config_shared PRIVATE IOC_CONFIG_TOML_SUPPORT)
-endif()
+target_link_libraries(ioc_config_shared PUBLIC toml11::toml11)
+
 set_target_properties(ioc_config_shared PROPERTIES OUTPUT_NAME ioc_config)
 
 # Add version info
